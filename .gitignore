@@ -45,6 +45,7 @@ cscope.*
 build.sh
 .cproject
 .project
+.gitlab-ci-local/
 .settings/
 .vscode/
 GPATH
