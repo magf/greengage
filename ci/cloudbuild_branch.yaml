@@ -1,6 +1,6 @@
 substitutions:
   _IMAGE_VERSION: "7"  # Default
-  _IMAGE: "europe-west4-docker.pkg.dev/${PROJECT_ID}/greengage/gpdb${_IMAGE_VERSION}_u22"
+  _IMAGE: "europe-west1-docker.pkg.dev/${PROJECT_ID}/greengage/ggdb${_IMAGE_VERSION}_u22"
 
 steps:
 # Step 1: Update Git submodules
