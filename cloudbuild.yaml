@@ -1,5 +1,19 @@
+substitutions:
+  _IMAGE_VERSION: "7"  # Default
 steps:
-# Step 1: Update Git submodules
+# Step 1: Authenticate with Google Cloud
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'auth'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    echo $${_GOCLOUD_AUTH_CREDS} > /tmp/creds.json
+    gcloud auth activate-service-account --key-file=/tmp/creds.json
+  secretEnv:
+  - '_GOCLOUD_AUTH_CREDS'
+
+# Step 2: Update Git submodules
 - name: 'gcr.io/cloud-builders/git'
   entrypoint: 'bash'
   args:
@@ -9,34 +23,35 @@ steps:
   env:
   - 'GIT_DEPTH=1000'
 
-# Step 2: Build Docker image
+# Step 3: Build Docker image
 - name: 'gcr.io/cloud-builders/docker'
   entrypoint: 'bash'
   args:
   - '-c'
   - |
     LATEST_IMG_OPT=""
+    SHA_TAG=""
     PRETTY_BRANCH_NAME=$(echo "$BRANCH_NAME" | tr '/' '_')
     if [[ -n "$TAG_NAME" ]]; then
       PRETTY_BRANCH_NAME=$TAG_NAME
-      LATEST_TAG=$(git tag --list '7.*' --sort=-v:refname | head -n1)
+      LATEST_TAG=$(git tag --list "${_IMAGE_VERSION}.*" --sort=-v:refname | head -n1)
       if [[ "$TAG_NAME" == "$(printf "$TAG_NAME\n$LATEST_TAG" | tail -n1)" ]]; then
-        echo "The new tag is the latest -> build image with latest tag."
-        LATEST_IMG_OPT="-t europe-west1-docker.pkg.dev/tactile-acrobat-461712-m0/greengage-repo/gpdb7_u22:latest"
+        echo "Latest tag detected, building with latest tag."
+        LATEST_IMG_OPT="-t europe-west4-docker.pkg.dev/tactile-acrobat-461712-m0/greengage/gpdb${_IMAGE_VERSION}_u22:latest"
       fi
     elif [[ "$_EVENT_TYPE" == "pull_request" ]]; then
-      SHA_IMG_OPT="-t europe-west1-docker.pkg.dev/tactile-acrobat-461712-m0/greengage-repo/gpdb7_u22:$SHORT_SHA"
+      SHA_TAG="-sha-$SHORT_SHA"
     fi
     docker build -f ci/Dockerfile.ubuntu \
-      -t europe-west1-docker.pkg.dev/tactile-acrobat-461712-m0/greengage-repo/gpdb7_u22:$PRETTY_BRANCH_NAME \
-      $LATEST_IMG_OPT $SHA_IMG_OPT .
+      -t europe-west4-docker.pkg.dev/tactile-acrobat-461712-m0/greengage/gpdb${_IMAGE_VERSION}_u22:$PRETTY_BRANCH_NAME$SHA_TAG \
+      $LATEST_IMG_OPT .
   env:
   - 'BRANCH_NAME=$BRANCH_NAME'
   - 'TAG_NAME=$TAG_NAME'
   - 'SHORT_SHA=$SHORT_SHA'
   - '_EVENT_TYPE=$EVENT_TYPE'
 
-# Step 3: Push Docker images
+# Step 4: Push Docker images
 - name: 'gcr.io/cloud-builders/docker'
   entrypoint: 'bash'
   args:
@@ -46,15 +61,15 @@ steps:
     if [[ -n "$TAG_NAME" ]]; then
       PRETTY_BRANCH_NAME=$TAG_NAME
     fi
-    docker push europe-west1-docker.pkg.dev/tactile-acrobat-461712-m0/greengage-repo/gpdb7_u22:$PRETTY_BRANCH_NAME
+    docker push europe-west4-docker.pkg.dev/tactile-acrobat-461712-m0/greengage/gpdb${_IMAGE_VERSION}_u22:$PRETTY_BRANCH_NAME
     if [[ -n "$TAG_NAME" ]]; then
-      LATEST_TAG=$(git tag --list '7.*' --sort=-v:refname | head -n1)
+      LATEST_TAG=$(git tag --list "${_IMAGE_VERSION}.*" --sort=-v:refname | head -n1)
       if [[ "$TAG_NAME" == "$(printf "$TAG_NAME\n$LATEST_TAG" | tail -n1)" ]]; then
-         docker push europe-west1-docker.pkg.dev/tactile-acrobat-461712-m0/greengage-repo/gpdb7_u22:latest
+        docker push europe-west4-docker.pkg.dev/tactile-acrobat-461712-m0/greengage/gpdb${_IMAGE_VERSION}_u22:latest
       fi
     fi
     if [[ "$_EVENT_TYPE" == "pull_request" ]]; then
-      docker push europe-west1-docker.pkg.dev/tactile-acrobat-461712-m0/greengage-repo/gpdb7_u22:$SHORT_SHA
+      docker push europe-west4-docker.pkg.dev/tactile-acrobat-461712-m0/greengage/gpdb${_IMAGE_VERSION}_u22:$PRETTY_BRANCH_NAME$SHA_TAG
     fi
   env:
   - 'BRANCH_NAME=$BRANCH_NAME'
@@ -62,8 +77,12 @@ steps:
   - 'SHORT_SHA=$SHORT_SHA'
   - '_EVENT_TYPE=$EVENT_TYPE'
 
+secrets:
+- secretName: 'gcloud-credentials'
+  secretVersion: 'latest'
+
 images:
-- 'europe-west1-docker.pkg.dev/tactile-acrobat-461712-m0/greengage-repo/gpdb7_u22'
+- 'europe-west4-docker.pkg.dev/tactile-acrobat-461712-m0/greengage/gpdb${_IMAGE_VERSION}_u22'
 
 options:
   logging: CLOUD_LOGGING_ONLY
