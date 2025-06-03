@@ -77,10 +77,6 @@ steps:
   - 'SHORT_SHA=$SHORT_SHA'
   - '_EVENT_TYPE=$EVENT_TYPE'
 
-secrets:
-- secretName: 'gcloud-credentials'
-  secretVersion: 'latest'
-
 images:
 - 'europe-west4-docker.pkg.dev/tactile-acrobat-461712-m0/greengage/gpdb${_IMAGE_VERSION}_u22'
 
