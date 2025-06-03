@@ -19,7 +19,7 @@ steps:
   args:
   - '-c'
   - |
-    image="$_IMAGE:${BRANCH_NAME/\//_}"
+    image="$_IMAGE:$(echo "$BRANCH_NAME" | tr '/' '_')"
     docker build -f ci/Dockerfile.ubuntu \
       -t $image .
     docker push $image
