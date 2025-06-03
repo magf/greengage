@@ -1,0 +1,43 @@
+substitutions:
+  _IMAGE_VERSION: "7"  # Default
+  _IMAGE: "europe-west4-docker.pkg.dev/tactile-acrobat-461712-m0/greengage/gpdb${_IMAGE_VERSION}_u22"
+
+steps:
+# Step 1: Authenticate with Google Cloud
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'auth'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    echo $${_GOCLOUD_AUTH_CREDS} > /tmp/creds.json
+    gcloud auth activate-service-account --key-file=/tmp/creds.json
+  secretEnv:
+  - '_GOCLOUD_AUTH_CREDS'
+
+# Step 2: Update Git submodules
+- name: 'gcr.io/cloud-builders/git'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    git submodule update --init --recursive
+  env:
+  - 'GIT_DEPTH=1000'
+
+# Step 3: Build&Push  Docker image
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    image="$_IMAGE:${BRANCH_NAME/\//_}"
+    docker build -f ci/Dockerfile.ubuntu \
+      -t $image .
+    docker push $image
+
+images:
+- "$_IMAGE"
+
+options:
+  logging: CLOUD_LOGGING_ONLY
