@@ -4,10 +4,9 @@
 
 Change directory to gpdb sources destination. Make sure that directry doesn't contain binary objects from previous builds. Then run:
 
-```bash 
+```bash
 docker build -t gpdb6_regress:latest -f ci/Dockerfile.ubuntu .
 ```
-
 
 ## Full regression tests suite run
 
@@ -44,11 +43,14 @@ docker run --rm -it gpdb6_regress:latest bash -c "gpdb_src/concourse/scripts/uni
 
 1. Build or pull from internal registry (see above) needed image
 1. Start container with
+
    ```bash
    docker run --name gpdb6_demo --rm -it --sysctl 'kernel.sem=500 1024000 200 4096' gpdb6_regress:latest \
      bash -c "ssh-keygen -A && /usr/sbin/sshd && bash"
    ```
+
 1. Run the next commands in container
+
    ```bash
    source gpdb_src/concourse/scripts/common.bash
    # this command unpack binaries to `/usr/local/greengage-db-devel/`
@@ -67,11 +69,13 @@ Behave tests now can run locally with docker-compose.
 
 Feature files are located in `gpMgmt/test/behave/mgmt_utils`
 Before run tests you need to build a docker-image
+
 ```bash
 docker build -t "greengage6_regress:${BRANCH_NAME}" -f ci/Dockerfile.ubuntu .
 ```
 
 Command to run features:
+
 ```bash
 # Run all tests
 export IMAGE="greengage6_regress:${BRANCH_NAME}"
@@ -81,14 +85,13 @@ bash ci/scripts/run_behave_tests.bash
 bash ci/scripts/run_behave_tests.bash gpstart gpstop
 ```
 
-
 Tests use `allure-behave` package and store allure output files in `allure-results` folder
 **NOTE** that `allure-behave` has too old a version because it is compatible with `python2`.
 Also, the allure report for each failed test has gpdb logs attached files. See `gpMgmt/test/behave_utils/ci/formatter.py`
-It required to add `gpMgmt/tests` directory to `PYTHONPATH`. 
+It required to add `gpMgmt/tests` directory to `PYTHONPATH`.
 
 Greengage cluster in Docker containers has its own peculiarities in preparing a cluster for tests.
-All tests are run in one way or another on the demo cluster, wherever possible. 
+All tests are run in one way or another on the demo cluster, wherever possible.
 For example, cross_subnet tests or tests with tag `concourse_cluster` currently not worked because of too complex cluster preconditions.
 
 Tests in a docker-compose cluster use the same ssh keys for `gpadmin` user and pre-add the cluster hosts to `.ssh/know_hosts` and `/etc/hosts`.
