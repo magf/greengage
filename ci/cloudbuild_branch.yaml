@@ -9,7 +9,7 @@ steps:
   args:
   - '-c'
   - |
-    git fetch --unshallow --tags || git fetch --tags --depth=0
+    git fetch --tags
     git submodule update --init --recursive
   env:
   - 'GIT_DEPTH=1000'
