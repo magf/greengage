@@ -46,6 +46,7 @@ build.sh
 .cproject
 .project
 .gitlab-ci-local/
+.local/
 .settings/
 .vscode/
 GPATH
