@@ -21,7 +21,8 @@ steps:
   - '-c'
   - |
     image="$_IMAGE:$(echo "$BRANCH_NAME" | tr '/' '_')"
-    docker build --file ci/Dockerfile.ubuntu.build --build-arg PROJECT_ID=$PROJECT_ID --tag $image --push .
+    docker build --file ci/Dockerfile.ubuntu.build --build-arg PROJECT_ID=$PROJECT_ID --tag $image .
+    docker push $image
 
 images:
 - "$_IMAGE"
