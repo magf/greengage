@@ -1,5 +1,5 @@
 substitutions:
-  _IMAGE_VERSION: "7"  # Default
+  _IMAGE_VERSION: "6"  # Default
   _IMAGE: "europe-west1-docker.pkg.dev/${PROJECT_ID}/greengage/ggdb${_IMAGE_VERSION}_u22"
 
 steps:
@@ -9,6 +9,7 @@ steps:
   args:
   - '-c'
   - |
+    git fetch --unshallow --tags || git fetch --tags --depth=0
     git submodule update --init --recursive
   env:
   - 'GIT_DEPTH=1000'
@@ -20,9 +21,7 @@ steps:
   - '-c'
   - |
     image="$_IMAGE:$(echo "$BRANCH_NAME" | tr '/' '_')"
-    docker build -f ci/Dockerfile.ubuntu \
-      -t $image .
-    docker push $image
+    docker build --file ci/Dockerfile.ubuntu.build --build-arg PROJECT_ID=$PROJECT_ID --tag $image --push .
 
 images:
 - "$_IMAGE"
