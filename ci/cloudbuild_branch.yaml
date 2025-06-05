@@ -10,7 +10,7 @@ steps:
   args:
   - '-c'
   - |
-    git fetch --unshallow --tags --depth=1
+    git fetch --unshallow --tags
     git submodule update --init --recursive
     git describe --tags --abbrev=0 | tr '/' '_' > /workspace/image_tag.txt
 
