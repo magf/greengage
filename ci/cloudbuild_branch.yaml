@@ -27,13 +27,13 @@ steps:
   - '-c'
   - |
     image_tag=$(cat /workspace/image_tag.txt)
-    full_image="${_IMAGE}-${TARGET_OS}${TARGET_OS_VERSION}:${image_tag}"
+    full_image="${_IMAGE}-$${TARGET_OS}$${TARGET_OS_VERSION}:${image_tag}"
     
     docker build --tag $full_image \
-      --build-arg PYTHON3=$PYTHON3 \
+      --build-arg PYTHON3=$$PYTHON3 \
+      --build-arg TARGET_OS=$$TARGET_OS \
+      --build-arg TARGET_OS_VERSION=$$TARGET_OS_VERSION \
       --build-arg PROJECT_ID=$PROJECT_ID \
-      --build-arg TARGET_OS=$TARGET_OS \
-      --build-arg TARGET_OS_VERSION=$TARGET_OS_VERSION \
       .
     docker push $full_image
 
@@ -50,13 +50,13 @@ steps:
   - '-c'
   - |
     image_tag=$(cat /workspace/image_tag.txt)
-    full_image="${_IMAGE}-${TARGET_OS}${TARGET_OS_VERSION}:${image_tag}"
+    full_image="${_IMAGE}-$${TARGET_OS}$${TARGET_OS_VERSION}:${image_tag}"
     
     docker build --tag $full_image \
-      --build-arg PYTHON3=$PYTHON3 \
+      --build-arg PYTHON3=$$PYTHON3 \
+      --build-arg TARGET_OS=$$TARGET_OS \
+      --build-arg TARGET_OS_VERSION=$$TARGET_OS_VERSION \
       --build-arg PROJECT_ID=$PROJECT_ID \
-      --build-arg TARGET_OS=$TARGET_OS \
-      --build-arg TARGET_OS_VERSION=$TARGET_OS_VERSION \
       .
     docker push $full_image
 
