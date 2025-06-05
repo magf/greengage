@@ -1,31 +1,67 @@
 substitutions:
-  _IMAGE_VERSION: "6"  # Default
-  _IMAGE: "europe-west1-docker.pkg.dev/${PROJECT_ID}/greengage/ggdb${_IMAGE_VERSION}_u22"
+  _IMAGE_VERSION: "6"
+  _IMAGE: "europe-west1-docker.pkg.dev/${PROJECT_ID}/greengage/ggdb${_IMAGE_VERSION}"
 
 steps:
-# Step 1: Update Git submodules
+# Step 1 - Prepare
 - name: 'gcr.io/cloud-builders/git'
+  id: prepare
   entrypoint: 'bash'
   args:
   - '-c'
   - |
-    git fetch --unshallow --tags || git fetch --tags --depth=0
+    git fetch --unshallow --tags --depth=1
     git submodule update --init --recursive
-  env:
-  - 'GIT_DEPTH=1000'
 
-# Step 2: Build&Push  Docker image
+# Setp 2 - Build CentOS
 - name: 'gcr.io/cloud-builders/docker'
+  id: build_centos
+  waitFor: ['prepare']
+  env:
+    - 'TARGET_OS=centos'
+    - 'TARGET_OS_VERSION=7'
   entrypoint: 'bash'
   args:
   - '-c'
   - |
-    image="$_IMAGE:$(echo "$BRANCH_NAME" | tr '/' '_')"
-    docker build --file ci/Dockerfile.ubuntu.build --build-arg PROJECT_ID=$PROJECT_ID --tag $image .
-    docker push $image
+    image_tag="$(git describe --tags --abbrev=0 | tr '/' '_')"
+    full_image="${_IMAGE}-${TARGET_OS}${TARGET_OS_VERSION}:${image_tag}"
+    
+    docker build --tag $full_image \
+      --build-arg PYTHON3=$PYTHON3 \
+      --build-arg PROJECT_ID=$PROJECT_ID \
+      --build-arg TARGET_OS=$TARGET_OS \
+      --build-arg TARGET_OS_VERSION=$TARGET_OS_VERSION \
+      .
+    docker push $full_image
 
+# Setp 2 - Build Ubuntu
+- name: 'gcr.io/cloud-builders/docker'
+  id: build_ubuntu
+  waitFor: ['prepare']
+  env:
+    - 'TARGET_OS=ubuntu'
+    - 'TARGET_OS_VERSION=22'
+    - 'PYTHON3=python3'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    image_tag="$(git describe --tags --abbrev=0 | tr '/' '_')"
+    full_image="${_IMAGE}-${TARGET_OS}${TARGET_OS_VERSION}:${image_tag}"
+    
+    docker build --tag $full_image \
+      --build-arg PYTHON3=$PYTHON3 \
+      --build-arg PROJECT_ID=$PROJECT_ID \
+      --build-arg TARGET_OS=$TARGET_OS \
+      --build-arg TARGET_OS_VERSION=$TARGET_OS_VERSION \
+      .
+    docker push $full_image
+
+# Register Images in Cloud Build
 images:
-- "$_IMAGE"
+  - "${_IMAGE}-centos7:$(git describe --tags --abbrev=0 | tr '/' '_')"
+  - "${_IMAGE}-ubuntu22:$(git describe --tags --abbrev=0 | tr '/' '_')"
 
 options:
   machineType: 'E2_HIGHCPU_8'

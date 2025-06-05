@@ -1,4 +1,5 @@
-FROM centos:centos7 as base
+# Old Dockerfile for FULL CentOS builds
+FROM centos:centos7 AS base
 
 # Reinstall glibc-common. This is necessary to get langpacks in docker
 # because docker images don't contain them.
@@ -68,7 +69,7 @@ RUN wget https://ftp.postgresql.org/pub/dev/pg_bsd_indent-1.3.tar.gz && \
 
 WORKDIR /home/gpadmin
 
-FROM base as build
+FROM base AS build
 
 COPY . gpdb_src
 
@@ -82,11 +83,11 @@ ENV CONFIGURE_FLAGS="--enable-debug-extensions --with-gssapi --enable-cassert --
 # Compile with running mocking tests
 RUN bash /home/gpadmin/gpdb_src/concourse/scripts/compile_gpdb.bash
 
-FROM base as code
+FROM base AS code
 COPY . gpdb_src
 RUN rm -rf gpdb_src/.git/
 
-FROM base as test
+FROM base AS test
 COPY --from=code /home/gpadmin/gpdb_src gpdb_src
 COPY --from=build /home/gpadmin/bin_gpdb /home/gpadmin/bin_gpdb
 

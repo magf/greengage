@@ -1,3 +1,6 @@
+# Base image for Ubuntu 22 builds
+# docker build --tag europe-west1-docker.pkg.dev/tactile-acrobat-461712-m0/greengage/ggdb-base:ubuntu22 --push - < ci/Dockerfile.ubuntu22
+
 FROM ubuntu:22.04
 
 RUN <<EOF

@@ -1,3 +1,4 @@
+# Old Dockerfile for FULL Ubuntu builds
 FROM ubuntu:22.04 AS base
 
 COPY README.ubuntu.bash ./
