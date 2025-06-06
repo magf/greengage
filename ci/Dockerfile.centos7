@@ -1,5 +1,5 @@
 # Base image for CentOS 7
-# docker build --tag europe-west1-docker.pkg.dev/tactile-acrobat-461712-m0/greengage/ggdb-base:centos-7 --push - < ci/Dockerfile.centos7
+# docker build --tag europe-west1-docker.pkg.dev/tactile-acrobat-461712-m0/greengage/ggdb6-base:centos-7 --push - < ci/Dockerfile.centos7
 
 FROM centos:centos7
 

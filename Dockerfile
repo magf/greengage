@@ -2,23 +2,26 @@
 # Build image with parameters
 #
 # Example (bash):
-# export IMAGE=europe-west1-docker.pkg.dev/${PROJECT_ID:=tactile-acrobat-461712-m0}/greengage/ggdb${_IMAGE_VERSION:-6}_${TARGET_OS:=centos}${TARGET_OS_VERSION:=7}:$(git describe --tags --abbrev=0 HEAD^)
+# export IMAGE=${LOCATION:=europe-west1}-docker.pkg.dev/${PROJECT_ID:=tactile-acrobat-461712-m0}/greengage/ggdb${_IMAGE_VERSION:-6}_${TARGET_OS:=centos}${TARGET_OS_VERSION:=7}:$(git describe --tags --abbrev=0 HEAD^)
 # or
-# export IMAGE=europe-west1-docker.pkg.dev/${PROJECT_ID:=tactile-acrobat-461712-m0}/greengage/ggdb${_IMAGE_VERSION:-6}_${TARGET_OS:=ubuntu}${TARGET_OS_VERSION:=22}:$(git describe --tags --abbrev=0 HEAD^) PYTHON3=python3
+# export IMAGE=${LOCATION:=europe-west1}-docker.pkg.dev/${PROJECT_ID:=tactile-acrobat-461712-m0}/greengage/ggdb${_IMAGE_VERSION:-6}_${TARGET_OS:=ubuntu}${TARGET_OS_VERSION:=22}:$(git describe --tags --abbrev=0 HEAD^) PYTHON3=python3
 #
 # docker build --push --tag $IMAGE \
 #   --build-arg PYTHON3=$PYTHON3 \
+#   --build-arg LOCATION=$LOCATION \
 #   --build-arg PROJECT_ID=$PROJECT_ID \
 #   --build-arg TARGET_OS=$TARGET_OS \
 #   --build-arg TARGET_OS_VERSION=$TARGET_OS_VERSION \
 # .
 
+ARG LOCATION=europe-west1
 ARG PROJECT_ID=tactile-acrobat-461712-m0
 
+ARG VERSION=6
 ARG TARGET_OS=centos
 ARG TARGET_OS_VERSION=7
 
-ARG BASE=europe-west1-docker.pkg.dev/$PROJECT_ID/greengage/ggdb-base:$TARGET_OS$TARGET_OS_VERSION
+ARG BASE=$LOCATION-docker.pkg.dev/$PROJECT_ID/greengage/ggdb$VERSION-base:$TARGET_OS$TARGET_OS_VERSION
 
 FROM $BASE AS build
 
