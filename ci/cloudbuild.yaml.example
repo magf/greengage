@@ -1,6 +1,8 @@
+# This is example for branch pipeline.
+# It NOT works from HERE!
+# CI managed from Google Cloud Build
 substitutions:
-  _IMAGE_VERSION: "6"
-  _IMAGE: "europe-west1-docker.pkg.dev/${PROJECT_ID}/greengage/ggdb${_IMAGE_VERSION}"
+  _IMAGE: "$LOCATION-docker.pkg.dev/$PROJECT_ID/greengage/ggdb"
 
 steps:
 # Step 1 - Prepare source code
@@ -27,7 +29,7 @@ steps:
   - '-c'
   - |
     image_tag=$(cat /workspace/image_tag.txt)
-    full_image="${_IMAGE}-$${TARGET_OS}$${TARGET_OS_VERSION}:${image_tag}"
+    full_image="${_IMAGE}${image_tag:0:1}-$${TARGET_OS}$${TARGET_OS_VERSION}:${image_tag}"
     
     docker build --tag $full_image \
       --build-arg PYTHON3=$$PYTHON3 \
@@ -50,7 +52,7 @@ steps:
   - '-c'
   - |
     image_tag=$(cat /workspace/image_tag.txt)
-    full_image="${_IMAGE}-$${TARGET_OS}$${TARGET_OS_VERSION}:${image_tag}"
+    full_image="${_IMAGE}${image_tag:0:1}-$${TARGET_OS}$${TARGET_OS_VERSION}:${image_tag}"
     
     docker build --tag $full_image \
       --build-arg PYTHON3=$$PYTHON3 \
