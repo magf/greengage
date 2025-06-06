@@ -3,6 +3,9 @@
 # CI managed from Google Cloud Build
 steps:
   - name: gcr.io/cloud-builders/git
+    env:
+      - GIT_ADVICE=0
+      - GIT_DEPTH=1000
     args:
       - '-c'
       - |
@@ -12,14 +15,14 @@ steps:
         #!/bin/bash
         set -e
         tag=$(git describe --tags --abbrev=0 | tr '/' '_')
-        image="${_IMAGE}\${tag:0:1}-\${TARGET_OS}\${TARGET_OS_VERSION}:\${tag}"
-        docker build --tag \$$image \
-          --build-arg PYTHON3=\$PYTHON3 \
-          --build-arg TARGET_OS=\$TARGET_OS \
-          --build-arg TARGET_OS_VERSION=\$TARGET_OS_VERSION \
+        image="${_IMAGE}\${tag:0:1}-\$${TARGET_OS}\$${TARGET_OS_VERSION}:\${tag}"
+        docker build --tag \$image \
+          --build-arg PYTHON3=\$$PYTHON3 \
+          --build-arg TARGET_OS=\$$TARGET_OS \
+          --build-arg TARGET_OS_VERSION=\$$TARGET_OS_VERSION \
           --build-arg PROJECT_ID=$PROJECT_ID \
           .
-        docker push $$image
+        docker push \$$image
         EOF
         chmod +x /workspace/build.sh
         cat /workspace/build.sh
@@ -53,4 +56,4 @@ options:
   machineType: E2_HIGHCPU_8
   logging: CLOUD_LOGGING_ONLY
 substitutions:
-  _IMAGE: europe-west1-docker.pkg.dev/${PROJECT_ID}/greengage/ggdb
+  _IMAGE: 'europe-west1-docker.pkg.dev/${PROJECT_ID}/greengage/ggdb'
