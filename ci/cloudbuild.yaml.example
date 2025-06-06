@@ -12,11 +12,11 @@ steps:
         #!/bin/bash
         set -e
         tag=$(git describe --tags --abbrev=0 | tr '/' '_')
-        image="${_IMAGE}$${tag:0:1}-$${TARGET_OS}$${TARGET_OS_VERSION}:$${tag}"
-        docker build --tag $$image \
-          --build-arg PYTHON3=$$PYTHON3 \
-          --build-arg TARGET_OS=$$TARGET_OS \
-          --build-arg TARGET_OS_VERSION=$$TARGET_OS_VERSION \
+        image="${_IMAGE}\${tag:0:1}-\${TARGET_OS}\${TARGET_OS_VERSION}:\${tag}"
+        docker build --tag \$$image \
+          --build-arg PYTHON3=\$PYTHON3 \
+          --build-arg TARGET_OS=\$TARGET_OS \
+          --build-arg TARGET_OS_VERSION=\$TARGET_OS_VERSION \
           --build-arg PROJECT_ID=$PROJECT_ID \
           .
         docker push $$image
