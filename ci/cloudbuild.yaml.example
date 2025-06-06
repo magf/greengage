@@ -1,68 +1,67 @@
 # This is example for branch pipeline.
 # It NOT works from HERE!
 # CI managed from Google Cloud Build
-substitutions:
-  _IMAGE: "$LOCATION-docker.pkg.dev/$PROJECT_ID/greengage/ggdb"
-
 steps:
-# Step 1 - Prepare source code and create shared script
-- name: 'gcr.io/cloud-builders/git'
-  id: prepare
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    git fetch --unshallow --tags
-    git submodule update --init --recursive
-    git describe --tags --abbrev=0 | tr '/' '_' > /workspace/image_tag.txt
-    
-    # Create shared build script
-    cat << 'EOF' > /workspace/build.sh
-    #!/bin/bash
-    set -e
-    
-    image_tag=$(cat /workspace/image_tag.txt)
-    full_image="${_IMAGE}${image_tag:0:1}-${TARGET_OS}${TARGET_OS_VERSION}:${image_tag}"
-    
-    docker build --tag $full_image \
-      --build-arg PYTHON3=$PYTHON3 \
-      --build-arg TARGET_OS=$TARGET_OS \
-      --build-arg TARGET_OS_VERSION=$TARGET_OS_VERSION \
-      --build-arg PROJECT_ID=$PROJECT_ID \
-      .
-    docker push $full_image
-    EOF
-    
-    chmod +x /workspace/build.sh
+  - name: gcr.io/cloud-builders/git
+    args:
+      - '-c'
+      - >
+        git fetch --unshallow --tags
 
-# Step 2 - Build CentOS image
-- name: 'gcr.io/cloud-builders/docker'
-  id: build_centos
-  waitFor: ['prepare']
-  env:
-    - 'TARGET_OS=centos'
-    - 'TARGET_OS_VERSION=7'
-    - 'PYTHON3='  # Empty for CentOS
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    source /workspace/build.sh
+        git submodule update --init --recursive
 
-# Step 3 - Build Ubuntu image
-- name: 'gcr.io/cloud-builders/docker'
-  id: build_ubuntu
-  waitFor: ['prepare']
-  env:
-    - 'TARGET_OS=ubuntu'
-    - 'TARGET_OS_VERSION=22'
-    - 'PYTHON3=python3'
-  entrypoint: 'bash'
-  args:
-  - '-c'
-  - |
-    source /workspace/build.sh
+        # Create shared build script
 
+        cat << EOF > /workspace/build.sh
+
+        #!/bin/bash
+
+        set -e
+        
+        tag=$(git describe --tags --abbrev=0 | tr '/' '_')
+
+        image="${_IMAGE}$${tag:0:1}-$${TARGET_OS}$${TARGET_OS_VERSION}:$${tag}"
+
+        docker build --tag $$image
+          --build-arg PYTHON3=$$PYTHON3
+          --build-arg TARGET_OS=$$TARGET_OS
+          --build-arg TARGET_OS_VERSION=$$TARGET_OS_VERSION
+          --build-arg PROJECT_ID=$PROJECT_ID
+          .
+
+        docker push $$image
+
+        EOF
+
+        chmod +x /workspace/build.sh
+    id: prepare
+    entrypoint: bash
+  - name: gcr.io/cloud-builders/docker
+    env:
+      - TARGET_OS=centos
+      - TARGET_OS_VERSION=7
+      - PYTHON3=
+    args:
+      - '-c'
+      - source /workspace/build.sh
+    id: build_centos
+    waitFor:
+      - prepare
+    entrypoint: bash
+  - name: gcr.io/cloud-builders/docker
+    env:
+      - TARGET_OS=ubuntu
+      - TARGET_OS_VERSION=22
+      - PYTHON3=python3
+    args:
+      - '-c'
+      - source /workspace/build.sh
+    id: build_ubuntu
+    waitFor:
+      - prepare
+    entrypoint: bash
 options:
-  machineType: 'E2_HIGHCPU_8'
+  machineType: E2_HIGHCPU_8
   logging: CLOUD_LOGGING_ONLY
+substitutions:
+  _IMAGE: $LOCATION-docker.pkg.dev/$PROJECT_ID/greengage/ggdb
