@@ -3,14 +3,9 @@ name: Build for All Branches
 on:
   push:
     branches:
-      - 'v6*'
-      - 'feature/v6*'
-      - 'v7*'
-      - 'feature/v7*'
+      - '*'
     tags:
-      - '6.*'
-      - '7.*'
-
+      - '*'
 env:
   CI_REPO: magf/ci
 
