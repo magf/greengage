@@ -1,0 +1,65 @@
+name: Build for All Branches
+
+on:
+  push:
+    branches:
+      - 'v6*'
+      - 'feature/v6*'
+      - 'v7*'
+      - 'feature/v7*'
+    tags:
+      - '6.*'
+      - '7.*'
+
+env:
+  CI_REPO: magf/ci
+
+jobs:
+  build:
+    runs-on: docker
+    steps:
+      - name: Checkout greengage repo
+        uses: actions/checkout@v4
+        with:
+          repository: magf/greengage
+          fetch-depth: 0
+      - name: Build for v6 - centos7
+        if: startsWith(github.ref, 'refs/heads/v6') || startsWith(github.ref, 'refs/heads/feature/v6') || startsWith(github.ref, 'refs/tags/6.')
+        uses: ${{ env.CI_REPO }}/.github/workflows/greengage-reusable-build.yml@main
+        with:
+          version: 6
+          target_os: centos
+          target_os_version: 7
+          python3: ''
+        secrets:
+          ghcr_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build for v6 - ubuntu22
+        if: startsWith(github.ref, 'refs/heads/v6') || startsWith(github.ref, 'refs/heads/feature/v6') || startsWith(github.ref, 'refs/tags/6.')
+        uses: ${{ env.CI_REPO }}/.github/workflows/greengage-reusable-build.yml@main
+        with:
+          version: 6
+          target_os: ubuntu
+          target_os_version: 22
+          python3: PYTHON3
+        secrets:
+          ghcr_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build for v7 - rockylinux8
+        if: startsWith(github.ref, 'refs/heads/v7') || startsWith(github.ref, 'refs/heads/feature/v7') || startsWith(github.ref, 'refs/tags/7.')
+        uses: ${{ env.CI_REPO }}/.github/workflows/greengage-reusable-build.yml@main
+        with:
+          version: 7
+          target_os: rockylinux
+          target_os_version: 8
+          python3: ''
+        secrets:
+          ghcr_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build for v7 - ubuntu22
+        if: startsWith(github.ref, 'refs/heads/v7') || startsWith(github.ref, 'refs/heads/feature/v7') || startsWith(github.ref, 'refs/tags/7.')
+        uses: ${{ env.CI_REPO }}/.github/workflows/greengage-reusable-build.yml@main
+        with:
+          version: 7
+          target_os: ubuntu
+          target_os_version: 22
+          python3: PYTHON3
+        secrets:
+          ghcr_token: ${{ secrets.GITHUB_TOKEN }}
