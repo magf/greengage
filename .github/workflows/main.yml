@@ -41,8 +41,8 @@ jobs:
       - name: Run version and matrix script
         id: run_script
         run: |
-          chmod +x .ci/build_script.sh
-          .ci/build_script.sh determine_version
+          chmod +x .ci/build.sh
+          .ci/build.sh determine_version
         env:
           GITHUB_EVENT_NAME: ${{ github.event_name }}
           GITHUB_REF: ${{ github.ref }}
@@ -85,8 +85,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Run build script
         run: |
-          chmod +x .ci/build_script.sh
-          .ci/build_script.sh build
+          chmod +x .ci/build.sh
+          .ci/build.sh build
         env:
           VERSION: ${{ needs.determine_version.outputs.version }}
           TARGET_OS: ${{ matrix.config.TARGET_OS }}
