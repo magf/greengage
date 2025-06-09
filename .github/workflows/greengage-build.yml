@@ -17,7 +17,7 @@ jobs:
     secrets:
       ghcr_token: ${{ secrets.GITHUB_TOKEN }}
 
-  build-v6-ubuntu22:
+  build-v7-ubuntu22:
     uses: magf/greengage-ci/.github/workflows/greengage-reusable-build.yml@main
     with:
       version: 7
