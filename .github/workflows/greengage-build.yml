@@ -1,4 +1,4 @@
-name: Build for All Branches
+name: Build main Branch 6.x
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-v6-centos7:
-    uses: magf/ci/.github/workflows/greengage-reusable-build.yml@main
+    uses: magf/greengage-ci/.github/workflows/greengage-reusable-build.yml@main
     with:
       version: 6
       target_os: centos
@@ -19,7 +19,7 @@ jobs:
       ghcr_token: ${{ secrets.GITHUB_TOKEN }}
 
   build-v6-ubuntu22:
-    uses: magf/ci/.github/workflows/greengage-reusable-build.yml@main
+    uses: magf/greengage-ci/.github/workflows/greengage-reusable-build.yml@main
     with:
       version: 6
       target_os: ubuntu
