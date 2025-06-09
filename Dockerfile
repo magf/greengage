@@ -1,7 +1,7 @@
 # MAIN BUILDER
 # Build image with parameters
 #
-# Example (bash):
+# Example (Google):
 # export IMAGE=${LOCATION:=europe-west1}-docker.pkg.dev/${PROJECT_ID:=tactile-acrobat-461712-m0}/greengage/ggdb${_IMAGE_VERSION:-7}_${TARGET_OS:=rockylinux}${TARGET_OS_VERSION:=8}:$(git describe --tags --abbrev=0 HEAD^)
 # or
 # export IMAGE=${LOCATION:=europe-west1}-docker.pkg.dev/${PROJECT_ID:=tactile-acrobat-461712-m0}/greengage/ggdb${_IMAGE_VERSION:-7}_${TARGET_OS:=ubuntu}${TARGET_OS_VERSION:=22}:$(git describe --tags --abbrev=0 HEAD^) PYTHON3=python3
@@ -14,14 +14,29 @@
 #   --build-arg TARGET_OS_VERSION=$TARGET_OS_VERSION \
 # .
 
-ARG LOCATION=europe-west1
-ARG PROJECT_ID=tactile-acrobat-461712-m0
+
+# Example (GitHub):
+# export IMAGE=ghcr.io/${REPO:="greengagedb/greengage"}/ggdb${_IMAGE_VERSION:-7}_${TARGET_OS:=rockylinux}${TARGET_OS_VERSION:=8}:$(git describe --tags --abbrev=0 HEAD^)
+# or
+# export IMAGE=ghcr.io/${REPO:="greengagedb/greengage"}/ggdb${_IMAGE_VERSION:-7}_${TARGET_OS:=ubuntu}${TARGET_OS_VERSION:=22}:$(git describe --tags --abbrev=0 HEAD^) PYTHON3=python3
+#
+# docker build --push --tag $IMAGE \
+#   --build-arg PYTHON3=$PYTHON3 \
+#   --build-arg REPO=$REPO \
+#   --build-arg TARGET_OS=$TARGET_OS \
+#   --build-arg TARGET_OS_VERSION=$TARGET_OS_VERSION \
+# .
+
+# ARG LOCATION=europe-west1
+# ARG PROJECT_ID=tactile-acrobat-461712-m0
+ARG REPO=greengagedb/greengage
 
 ARG VERSION=7
 ARG TARGET_OS=rockylinux
 ARG TARGET_OS_VERSION=8
 
-ARG BASE=$LOCATION-docker.pkg.dev/$PROJECT_ID/greengage/ggdb$VERSION-base:$TARGET_OS$TARGET_OS_VERSION
+# ARG BASE=$LOCATION-docker.pkg.dev/$PROJECT_ID/greengage/ggdb$VERSION-base:$TARGET_OS$TARGET_OS_VERSION
+ARG BASE=ghcr.io/$REPO/ggdb$VERSION-base:$TARGET_OS$TARGET_OS_VERSION
 
 FROM $BASE AS build
 
