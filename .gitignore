@@ -51,8 +51,10 @@ cscope.*
 build.sh
 .cproject
 .project
+.gitlab-ci-local/
 .settings/
 .vscode/
+.local/
 GPATH
 GRTAGS
 GTAGS

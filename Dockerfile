@@ -2,7 +2,7 @@
 # Build image with parameters
 #
 # Example (bash):
-# export IMAGE=${LOCATION:=europe-west1}-docker.pkg.dev/${PROJECT_ID:=tactile-acrobat-461712-m0}/greengage/ggdb${_IMAGE_VERSION:-7}_${TARGET_OS:=rocky8}${TARGET_OS_VERSION:=8}:$(git describe --tags --abbrev=0 HEAD^)
+# export IMAGE=${LOCATION:=europe-west1}-docker.pkg.dev/${PROJECT_ID:=tactile-acrobat-461712-m0}/greengage/ggdb${_IMAGE_VERSION:-7}_${TARGET_OS:=rockylinux}${TARGET_OS_VERSION:=8}:$(git describe --tags --abbrev=0 HEAD^)
 # or
 # export IMAGE=${LOCATION:=europe-west1}-docker.pkg.dev/${PROJECT_ID:=tactile-acrobat-461712-m0}/greengage/ggdb${_IMAGE_VERSION:-7}_${TARGET_OS:=ubuntu}${TARGET_OS_VERSION:=22}:$(git describe --tags --abbrev=0 HEAD^) PYTHON3=python3
 #
@@ -60,10 +60,3 @@ RUN rm -rf gpdb_src/.git/
 FROM $BASE AS test
 COPY --from=code /home/gpadmin/gpdb_src gpdb_src
 COPY --from=build /home/gpadmin/bin_gpdb /home/gpadmin/bin_gpdb
-
-# Install entab used by pgindent utility.
-# This should be done using gpdb sources.
-RUN make -C gpdb_src/src/tools/entab install clean
-
-# Volume for tests output
-VOLUME /home/gpadmin/gpdb_src/src/test
