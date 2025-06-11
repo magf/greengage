@@ -1,4 +1,4 @@
-name: Build 6.x
+name: Greengage Auto Build
 
 on:
   push:
