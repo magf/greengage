@@ -1,11 +1,34 @@
-name: Build main Branch 6.x
+name: Build and Test
 
 on:
   push:
-    branches:
-      - 'main'
-    tags:
-      - '6.*'
+    tags: ['6.*']
+  pull_request:
+    branches: ['*']
+    tags: ['6.*']
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: 'Target branch for build'
+        required: true
+        default: 'main'
+        type: choice
+        options:
+          - 6.x
+          - main
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
+      debug_mode:
+        description: 'Enable debug mode'
+        type: boolean
+        default: false
 
 jobs:
   build-v6-centos7:
