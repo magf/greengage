@@ -1,8 +1,12 @@
-# Google Cloud Build Trigger Rules
+# CI migration rules
+
+## Google Cloud Build
+
+### Trigger Rules
 
 To replicate the GitLab CI rules in Google Cloud Build for the `magf/greengage` repository in project `tactile-acrobat-461712-m0`, we define triggers for branches matching `^(7\.x|main)$`, tags matching `^7\..*`, and pull requests to `7.x` or `main`.
 
-## Prerequisites
+### Prerequisites
 
 - **Project**: `tactile-acrobat-461712-m0`
 - **Repository**: `magf/greengage` (connected via Cloud Build GitHub App, 2nd gen)
@@ -12,9 +16,9 @@ To replicate the GitLab CI rules in Google Cloud Build for the `magf/greengage` 
 - **Artifact Registry**: Repository `greengage` in `europe-west4`
 - **Submodules**: `gpAux/extensions/pgbouncer/source`, `gpcontrib/gpcloud/test/googletest`
 
-## Trigger Configuration
+### Trigger Configuration
 
-### Trigger for Push to Branch (7.x or main)
+#### Trigger for Push to Branch (7.x or main)
 
 **Purpose**: Build for pushes to branches `7.x` or `main`.
 
@@ -54,7 +58,7 @@ gcloud builds triggers create github \
   --substitutions="_IMAGE_VERSION=7,_SOURCE_BRANCH=\$BRANCH_NAME"
 ```
 
-### Trigger for Push New Tag (7.*)
+#### Trigger for Push New Tag (7.*)
 
 **Purpose**: Build for tags starting with `7.` (e.g., `7.0.0`).
 
@@ -90,7 +94,7 @@ gcloud builds triggers create github \
   --substitutions="_IMAGE_VERSION=7"
 ```
 
-### Trigger for Pull Request (7.x or main)
+#### Trigger for Pull Request (7.x or main)
 
 **Purpose**: Build for pull requests targeting `7.x` or `main`.
 
@@ -129,7 +133,7 @@ gcloud builds triggers create github \
   --substitutions="_IMAGE_VERSION=7,_SOURCE_BRANCH=\$BRANCH_NAME,_TARGET_BRANCH=\$PULL_REQUEST,_PULL_REQUEST_NUMBER=\$PULL_REQUEST_NUMBER"
 ```
 
-## Testing Triggers
+### Testing Triggers
 
 To test:
 
@@ -171,7 +175,7 @@ To test:
    gcloud builds list --project=tactile-acrobat-461712-m0
    ```
 
-## Troubleshooting
+### Troubleshooting
 
 - **Trigger not firing**:
   - Verify repository connection in **Triggers**.
