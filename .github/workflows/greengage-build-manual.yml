@@ -7,6 +7,10 @@ on:
         description: 'Target branch to checkout and build'
         required: true
         default: 'main'
+        type: choice
+        options:
+          - '7.x'
+          - 'main'
       os_combination:
         description: 'Target OS (MUST be compatible with Version)'
         required: true
