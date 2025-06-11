@@ -90,7 +90,7 @@ jobs:
 
   manual-build:
     needs: parse-os
-    uses: magf/greengage-ci/.github/workflows/greengage-reusable-build.yml@main
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-build.yml@main
     with:
       version: ${{ needs.parse-os.outputs.version }}
       target_os: ${{ needs.parse-os.outputs.target_os }}
