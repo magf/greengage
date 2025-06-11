@@ -6,25 +6,6 @@ on:
   pull_request:
     branches: ['*']
     tags: ['7.*']
-  workflow_dispatch:
-    inputs:
-      target_branch:
-        description: 'Target branch for build'
-        required: true
-        default: '7.x'
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'warning'
-        type: choice
-        options:
-          - info
-          - warning
-          - debug
-      debug_mode:
-        description: 'Enable debug mode'
-        type: boolean
-        default: false
 
 jobs:
   build-v7-rockylinux8:
