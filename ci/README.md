@@ -4,10 +4,13 @@
 
 Change directory to gpdb sources destination. Make sure that directry doesn't contain binary objects from previous builds. Then run:
 for Ubuntu:
+
 ```bash
 docker build -t gpdb7_u22:latest -f ci/Dockerfile.ubuntu .
 ```
+
 for Rocky Linux:
+
 ```bash
 docker build -t gpdb7_regress:latest -f ci/Dockerfile .
 ```
@@ -16,13 +19,16 @@ docker build -t gpdb7_regress:latest -f ci/Dockerfile .
 
 We need to execute [../concourse/scripts/ic_gpdb.bash](../concourse/scripts/ic_gpdb.bash) in container to create demo cluster and run different test suites against it:
 for Ubuntu:
+
 ```bash
  docker run --name gpdb7_opt_on --rm -it -e TEST_OS=ubuntu \
   -e MAKE_TEST_COMMAND="-k PGOPTIONS='-c optimizer=on' installcheck-world" \
   --sysctl "kernel.sem=500 1024000 200 4096" gpdb7_u22:latest \
   /home/gpadmin/gpdb_src/concourse/scripts/ic_gpdb.bash
 ```
+
 for Rocky Linux:
+
 ```bash
  docker run --name gpdb7_opt_on --rm -it -e TEST_OS=centos \
   -e MAKE_TEST_COMMAND="-k PGOPTIONS='-c optimizer=on' installcheck-world" \
@@ -37,13 +43,16 @@ for Rocky Linux:
 
 * optimizer=on
 for Ubuntu:
+
 ```bash
  docker run --name gpdb7_opt_on --rm -it -e TEST_OS=ubuntu \
   -e MAKE_TEST_COMMAND="-k PGOPTIONS='-c optimizer=on -c jit=on -c jit_above_cost=0 -c optimizer_jit_above_cost=0 -c gp_explain_jit=off' installcheck" \
   --sysctl "kernel.sem=500 1024000 200 4096" gpdb7_u22:latest \
   /home/gpadmin/gpdb_src/concourse/scripts/ic_gpdb.bash
 ```
+
 for Rocky Linux:
+
 ```bash
  docker run --name gpdb7_opt_on --rm -it -e TEST_OS=centos \
   -e MAKE_TEST_COMMAND="-k PGOPTIONS='-c optimizer=on -c jit=on -c jit_above_cost=0 -c optimizer_jit_above_cost=0 -c gp_explain_jit=off' installcheck" \
@@ -53,13 +62,16 @@ for Rocky Linux:
 
 * optimizer=off
 for Ubuntu:
+
 ```bash
  docker run --name gpdb7_opt_on --rm -it -e TEST_OS=ubuntu \
   -e MAKE_TEST_COMMAND="make -k PGOPTIONS='-c optimizer=off -c jit=on -c jit_above_cost=0 -c gp_explain_jit=off' installcheck" \
   --sysctl "kernel.sem=500 1024000 200 4096" gpdb7_u22:latest \
   /home/gpadmin/gpdb_src/concourse/scripts/ic_gpdb.bash
 ```
+
 for Rocky Linux:
+
 ```bash
  docker run --name gpdb7_opt_on --rm -it -e TEST_OS=centos \
   -e MAKE_TEST_COMMAND="make -k PGOPTIONS='-c optimizer=off -c jit=on -c jit_above_cost=0 -c gp_explain_jit=off' installcheck" \
@@ -84,9 +96,11 @@ The work directory must be clean to pass this test. Please, stage or even commit
 ## ORCA unit test run
 
 for Ubuntu:
+
 ```bash
 docker run --rm -it gpdb7_u22:latest bash -c "gpdb_src/concourse/scripts/unit_tests_gporca.bash"
 ```
+
 for Rocky Linux:
 
 ```bash
@@ -98,16 +112,21 @@ docker run --rm -it gpdb7_regress:latest bash -c "gpdb_src/concourse/scripts/uni
 1. Build or pull from internal registry (see above) needed image
 1. Start container with
   for Ubuntu:
+
    ```bash
    docker run --name gpdb7_demo --rm -it --sysctl 'kernel.sem=500 1024000 200 4096' gpdb7_u22:latest \
      bash
    ```
+
   for Rocky Linux:
+
    ```bash
    docker run --name gpdb7_demo --rm -it --sysctl 'kernel.sem=500 1024000 200 4096' gpdb7_regress:latest \
      bash
    ```
+
 1. Run the next commands in container
+
    ```bash
    source gpdb_src/concourse/scripts/common.bash
    # this command unpack binaries to `/usr/local/greengage-db-devel/`
@@ -127,10 +146,13 @@ Behave tests now can run locally with docker-compose.
 Feature files are located in `gpMgmt/test/behave/mgmt_utils`
 Before run tests you need to build a docker-image
 for Ubuntu:
+
 ```bash
 docker build -t "greengage7_u22:${BRANCH_NAME}" -f ci/Dockerfile.ubuntu .
 ```
+
 for Rocky Linux:
+
 ```bash
 docker build -t "greengage7_regress:${BRANCH_NAME}" -f ci/Dockerfile .
 ```
@@ -138,6 +160,7 @@ docker build -t "greengage7_regress:${BRANCH_NAME}" -f ci/Dockerfile .
 Command to run features:
 
 for Ubuntu:
+
 ```bash
 # Run all tests
 IMAGE=greengage7_u22:${BRANCH_NAME} bash ci/scripts/run_behave_tests.bash
@@ -147,6 +170,7 @@ IMAGE=greengage7_u22:${BRANCH_NAME} bash ci/scripts/run_behave_tests.bash gpstar
 ```
 
 for Rocky Linux:
+
 ```bash
 # Run all tests
 IMAGE=greengage7_regress:${BRANCH_NAME} bash ci/scripts/run_behave_tests.bash
@@ -155,10 +179,9 @@ IMAGE=greengage7_regress:${BRANCH_NAME} bash ci/scripts/run_behave_tests.bash
 IMAGE=greengage7_regress:${BRANCH_NAME} bash ci/scripts/run_behave_tests.bash gpstart gpstop
 ```
 
-
 Tests use `allure-behave` package and store allure output files in `allure-results` folder.
 Also, the allure report for each failed test has gpdb logs attached files. See `gpMgmt/test/behave_utils/ci/formatter.py`
-It required to add `gpMgmt/tests` directory to `PYTHONPATH`. 
+It required to add `gpMgmt/tests` directory to `PYTHONPATH`.
 
 Greengage cluster in Docker containers has its own peculiarities in preparing a cluster for tests.
 All tests are run in one way or another on the demo cluster, wherever possible.
