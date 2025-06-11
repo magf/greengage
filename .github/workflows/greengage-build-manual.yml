@@ -87,13 +87,6 @@ jobs:
               echo "python3=" >> $GITHUB_OUTPUT
               ;;
           esac
-      - name: Checkout target branch
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.target_branch }}
-          repository: ${{ github.repository }}
-          submodules: recursive
-          fetch-depth: 0
 
   manual-build:
     needs: parse-os
