@@ -84,17 +84,8 @@ function _main() {
         time ./gpdb_src/concourse/scripts/test_binary_swap_gpdb.bash
     fi
 
-    echo "===== DEBUG after tests ====="
-    env
-
     if [ "${DUMP_DB}" == "true" ]; then
-        echo "===== DEBUG ====="
-        pwd
-        ls -lah
-        mkdir -p sqldump
-        chmod 777 sqldump
         su gpadmin -c ./gpdb_src/concourse/scripts/dumpdb.bash
-        ls -lah sqldump
     fi
 }
 
