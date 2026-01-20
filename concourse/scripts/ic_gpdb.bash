@@ -88,11 +88,13 @@ function _main() {
     env
 
     if [ "${DUMP_DB}" == "true" ]; then
-        chmod 777 sqldump
         echo "===== DEBUG ====="
         pwd
         ls -lah
+        mkdir -p sqldump
+        chmod 777 sqldump
         su gpadmin -c ./gpdb_src/concourse/scripts/dumpdb.bash
+        ls -lah sqldump
     fi
 }
 
