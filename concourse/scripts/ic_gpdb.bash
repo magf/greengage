@@ -78,14 +78,20 @@ function _main() {
     time make_cluster
     time gen_env
     time move_postgres_for_fdw
-    time run_test
+    [ -z "$SKIP_TESTS" ] && time run_test || echo "===== TESTS SKIPPED ====="
 
     if [ "${TEST_BINARY_SWAP}" == "true" ]; then
         time ./gpdb_src/concourse/scripts/test_binary_swap_gpdb.bash
     fi
 
+    echo "===== DEBUG after tests ====="
+    env
+
     if [ "${DUMP_DB}" == "true" ]; then
         chmod 777 sqldump
+        echo "===== DEBUG ====="
+        pwd
+        ls -lah
         su gpadmin -c ./gpdb_src/concourse/scripts/dumpdb.bash
     fi
 }
