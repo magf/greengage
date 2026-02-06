@@ -50,6 +50,10 @@ function _main() {
 
     time gen_env
 
+    echo " >>>>>> DEBUG at '$PWD' <<<<<<<"
+    echo " >>>>>> ls -lah /home/gpadmin/sqldump <<<<<<<"
+    ls -lah /home/gpadmin/sqldump
+
     time run_test
 }
 
