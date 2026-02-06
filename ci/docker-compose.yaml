@@ -13,7 +13,7 @@ x-common-volumes: &common-volumes
   volumes:
     - ./ssh_keys/id_rsa:/home/gpadmin/.ssh/id_rsa
     - ./ssh_keys/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
-    - ./sqldump/dump.sql:/home/gpadmin/gpdb_src/sqldump/dump.sql
+    - ./sqldump/dump.sql:/home/gpadmin/sqldump/dump.sql
 
 services:
   cdw:
