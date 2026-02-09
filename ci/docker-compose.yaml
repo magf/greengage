@@ -9,34 +9,38 @@ x-common-service: &common-service
   entrypoint: >
     sleep infinity
 
-x-common-volumes: &common-volumes
-  volumes:
-    - ${PWD}/ssh_keys/id_rsa:/home/gpadmin/.ssh/id_rsa
-    - ${PWD}/ssh_keys/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
-    - ${PWD}/sqldump/dump.sql:/home/gpadmin/sqldump/dump.sql
-
 services:
   cdw:
-    <<: [*common-service, *common-volumes]
+    <<: *common-service
     working_dir: /home/gpadmin
     hostname: cdw
     volumes:
-      - ${PWD}/allure-results:/tmp/allure-results
-      - ${PWD}/logs_cdw:/logs
-
+      - ./allure-results:/tmp/allure-results
+      - ./sqldump/dump.sql:/home/gpadmin/sqldump/dump.sql
+      - ./ssh_keys/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
+      - ./ssh_keys/id_rsa:/home/gpadmin/.ssh/id_rsa
+      - ./logs_cdw:/logs
   sdw1:
-    <<: [*common-service, *common-volumes]
+    <<: *common-service
     hostname: sdw1
     volumes:
-      - ${PWD}/logs_sdw1:/logs
-
+      - ./sqldump/dump.sql:/home/gpadmin/sqldump/dump.sql
+      - ./ssh_keys/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
+      - ./ssh_keys/id_rsa:/home/gpadmin/.ssh/id_rsa
+      - ./logs_sdw1:/logs
   sdw2:
-    <<: [*common-service, *common-volumes]
+    <<: *common-service
     hostname: sdw2
-      - ${PWD}/logs_sdw2:/logs
-
+    volumes:
+      - ./sqldump/dump.sql:/home/gpadmin/sqldump/dump.sql
+      - ./ssh_keys/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
+      - ./ssh_keys/id_rsa:/home/gpadmin/.ssh/id_rsa
+      - ./logs_sdw2:/logs
   sdw3:
-    <<: [*common-service, *common-volumes]
+    <<: *common-service
     hostname: sdw3
-      - ${PWD}/logs_sdw3:/logs
-  
+    volumes:
+      - ./sqldump/dump.sql:/home/gpadmin/sqldump/dump.sql
+      - ./ssh_keys/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
+      - ./ssh_keys/id_rsa:/home/gpadmin/.ssh/id_rsa
+      - ./logs_sdw3:/logs
