@@ -25,16 +25,18 @@ from pygresql import pg
 PARTITION_START_DATE = '2010-01-01'
 PARTITION_END_DATE = '2013-01-01'
 
-master_data_dir = os.environ.get('MASTER_DATA_DIRECTORY')
-if master_data_dir is None:
-    raise Exception('MASTER_DATA_DIRECTORY is not set')
+master_data_dir = None
 
 
 def execute_sql(dbname, sql):
-    result = None
-
     with dbconn.connect(dbconn.DbURL(dbname=dbname), unsetSearchPath=False) as conn:
-        result = dbconn.execSQL(conn, sql)
+        dbconn.execSQL(conn, sql)
+        conn.commit()
+
+def query_sql(dbname, sql):
+    with dbconn.connect(dbconn.DbURL(dbname=dbname), unsetSearchPath=False) as conn:
+        cursor = dbconn.execSQL(conn, sql)
+        result = cursor.fetchall()
         conn.commit()
 
     return result
@@ -185,10 +187,12 @@ def check_return_code(context, ret_code):
 
 
 def check_database_is_running(context):
-    if not 'PGPORT' in os.environ:
-        raise Exception('PGPORT should be set')
+    if not 'PGPORT' in os.environ or not 'MASTER_DATA_DIRECTORY' in os.environ:
+        return False
 
     pgport = int(os.environ['PGPORT'])
+    global master_data_dir
+    master_data_dir = os.environ['MASTER_DATA_DIRECTORY']
 
     running_status = chk_local_db_running(os.environ.get('MASTER_DATA_DIRECTORY'), pgport)
     gpdb_running = running_status[0] and running_status[1] and running_status[2] and running_status[3]
@@ -272,7 +276,8 @@ def create_database_if_not_exists(context, dbname, host=None, port=0, user=None)
     if not check_db_exists(dbname, host, port, user):
         create_database(context, dbname, host, port, user)
     context.dbname = dbname
-    context.conn = dbconn.connect(dbconn.DbURL(dbname=context.dbname), unsetSearchPath=False)
+    if not hasattr(context, 'conn'):
+        context.conn = dbconn.connect(dbconn.DbURL(dbname=context.dbname), unsetSearchPath=False)
 
 def create_database(context, dbname=None, host=None, port=0, user=None):
     LOOPS = 10
