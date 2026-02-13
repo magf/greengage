@@ -43,16 +43,16 @@ COPY . gpdb_src
 
 RUN mkdir bin_gpdb
 
+ARG SKIP_UNITTESTS
 ENV TARGET_OS_VERSION=22 \
     TARGET_OS=ubuntu \
     OUTPUT_ARTIFACT_DIR=bin_gpdb \
-    SKIP_UNITTESTS= \
 # To set default locale for unittests
     LANG=en_US.UTF-8 \
     CONFIGURE_FLAGS="--enable-debug-extensions --with-gssapi --enable-cassert --enable-debug --enable-depend"
 
 # Compile with running mocking tests
-RUN gpdb_src/concourse/scripts/compile_gpdb.bash
+RUN SKIP_UNITTESTS=$SKIP_UNITTESTS gpdb_src/concourse/scripts/compile_gpdb.bash
 
 FROM base AS code
 COPY . gpdb_src
