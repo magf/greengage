@@ -38,8 +38,8 @@ jobs:
           echo "Author: ${{ github.event.workflow_run.head_commit.author.name }}"
           echo "=================================================================="
 
-      - name: Move Docker storage to /mnt/docker
-        uses: greengagedb/greengage-ci/.github/actions/move-docker@CI-5233
+      - name: Maximize disk space
+        uses: greengagedb/greengage-ci/.github/actions/maximize-disk-space@v19
 
       - name: Determine version from branch
         id: version
