@@ -23,7 +23,7 @@ jobs:
       contents: read  # Explicit for default behavior
       packages: write # Required for GHCR access
       actions: write  # Required for artifact upload
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-build.yml@ADBDEV-9130
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-build.yml@v19
     with:
       version: 6
       target_os: ${{ matrix.target_os }}
@@ -42,7 +42,7 @@ jobs:
       contents: read  # Explicit for default behavior
       packages: read  # Explicit for GHCR access clarity
       actions: write  # Required for artifact upload
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-behave.yml@ADBDEV-9130
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-behave.yml@v19
     with:
       version: 6
       target_os: ${{ matrix.target_os }}
@@ -60,7 +60,7 @@ jobs:
       contents: read  # Explicit for default behavior
       packages: read  # Explicit for GHCR access clarity
       actions: write  # Required for artifact upload
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-regression.yml@v16
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-regression.yml@v19
     with:
       version: 6
       target_os: ${{ matrix.target_os }}
@@ -78,7 +78,7 @@ jobs:
       contents: read  # Explicit for default behavior
       packages: read  # Explicit for GHCR access clarity
       actions: write  # Required for artifact upload
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-orca.yml@v12
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-orca.yml@v19
     with:
       version: 6
       target_os: ${{ matrix.target_os }}
@@ -114,7 +114,7 @@ jobs:
       contents: read  # Explicit for default behavior
       packages: write # Required for GHCR access
       actions: write  # Required for artifact upload
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-upload.yml@GG-127-simple
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-upload.yml@v21
     with:
       version: 6
       target_os: ${{ matrix.target_os }}

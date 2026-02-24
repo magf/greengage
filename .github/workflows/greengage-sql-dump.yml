@@ -1,3 +1,4 @@
+# .github/workflows/greengage-sql-dump.yml
 name: Greengage SQL Dump
 
 on:
@@ -12,8 +13,12 @@ jobs:
   create-sql-dump-regression:
     runs-on: ubuntu-latest
     timeout-minutes: 180
+    if: |
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      !startsWith(github.event.workflow_run.head_branch, 'refs/tags/')
     strategy:
-      fail-fast: true # Stop on any failure in the matrix
+      fail-fast: true
       matrix:
         target_os: [ubuntu]
     permissions:
@@ -21,42 +26,62 @@ jobs:
       packages: read  # Explicit for GHCR access clarity
       actions: write  # Required for cache and artifact upload
     steps:
-      - name: Move Docker storage to /mnt/docker
+      - name: Display trigger information
+        env:
+          TRIGGER_NAME: ${{ github.event.workflow_run.name }}
+          TRIGGER_ID: ${{ github.event.workflow_run.id }}
+          TARGET_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+          COMMIT_MESSAGE: ${{ github.event.workflow_run.head_commit.message }}
+          AUTHOR_NAME: ${{ github.event.workflow_run.head_commit.author.name }}
         run: |
-          sudo bash -c '
-            systemctl stop docker
-            mkdir -p /mnt/docker
-            rsync -a /var/lib/docker/ /mnt/docker
-            chown -R docker:docker /mnt/docker
-            echo "{ \"data-root\": \"/mnt/docker\" }" > /etc/docker/daemon.json
-            systemctl start docker
-          '
+          cat << EOF
+          ================== Workflow Trigger Information ==================
+          Triggered by:   ${TRIGGER_NAME} (#${TRIGGER_ID})
+          Target branch:  ${TARGET_BRANCH}
+          Source commit:  ${SOURCE_SHA}
+          Commit message: ${COMMIT_MESSAGE}
+
+          Author: ${AUTHOR_NAME}
+          ==================================================================
+          EOF
+
+      - name: Maximize disk space
+        uses: greengagedb/greengage-ci/.github/actions/maximize-disk-space@v19
+
       - name: Determine version from branch
-        id: determine-version
+        id: version
+        env:
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
         run: |
-          if [ "${{ github.ref_name }}" = "main" ]; then
-            echo "version=6" >> $GITHUB_OUTPUT
-          elif [ "${{ github.ref_name }}" = "7.x" ]; then
-            echo "version=7" >> $GITHUB_OUTPUT
-          else
-            echo "Unsupported branch: ${{ github.ref_name }}"
-            exit 1
-          fi
+          case "$BRANCH" in
+            main)
+              echo "version=6" >> $GITHUB_OUTPUT
+              ;;
+            7.x)
+              echo "version=7" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "Unsupported branch: $BRANCH"
+              exit 1
+              ;;
+          esac
 
       - name: Create SQL Dump via regression tests
         uses: greengagedb/greengage-ci/.github/actions/tests/regression@v16
         with:
-          image: ghcr.io/${{ github.repository }}/ggdb${{ steps.determine-version.outputs.version }}_${{ matrix.target_os }}:${{ github.sha }}
+          image: ghcr.io/${{ github.repository }}/ggdb${{ steps.version.outputs.version }}_${{ matrix.target_os }}:${{ github.event.workflow_run.head_sha }}
           optimizer: postgres
           target_os: ${{ matrix.target_os }}
-          dump_db: 'true'
+          dump_db: "true"
 
-      - name: DEBUG
-        run: ls -lah /mnt/logs/*
+      # - name: Collect logs optimizer ${{ matrix.optimizer }}
+      #   if: always()
+      #   uses: greengagedb/greengage-ci/.github/actions/collect-logs@feat/collect-logs
 
       - name: Upload SQL Dump
         uses: actions/upload-artifact@v4
         with:
-          name: sqldump_ggdb${{ steps.determine-version.outputs.version }}_${{ matrix.target_os }}
+          name: sqldump_ggdb${{ steps.version.outputs.version }}_${{ matrix.target_os }}
           path: /mnt/logs/${{ matrix.target_os }}_postgres_sqldump.tar
           if-no-files-found: error
