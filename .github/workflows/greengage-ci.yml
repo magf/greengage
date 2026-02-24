@@ -27,7 +27,6 @@ jobs:
     with:
       version: 6
       target_os: ${{ matrix.target_os }}
-      skip_unittests: 'true'
     secrets:
       ghcr_token: ${{ secrets.GITHUB_TOKEN }}
 
