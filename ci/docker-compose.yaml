@@ -15,34 +15,27 @@ services:
     working_dir: /home/gpadmin
     hostname: cdw
     volumes:
-      - ${PWD}/allure-results:/tmp/allure-results
       - ${PWD}/sqldump/dump.sql:/home/gpadmin/sqldump/dump.sql
-      - ${PWD}/ssh_keys/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
-      - ${PWD}/ssh_keys/id_rsa:/home/gpadmin/.ssh/id_rsa
+      - ${PWD}/allure-results:/tmp/allure-results
+      - ${PWD}/ssh_keys:/home/gpadmin/.ssh.src
       - ${PWD}/logs_cdw:/logs
   sdw1:
     <<: *common-service
     hostname: sdw1
     volumes:
-      - ${PWD}/sqldump/dump.sql:/home/gpadmin/sqldump/dump.sql
-      - ${PWD}/ssh_keys/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
-      - ${PWD}/ssh_keys/id_rsa:/home/gpadmin/.ssh/id_rsa
+      - ${PWD}/ssh_keys:/home/gpadmin/.ssh.src
       - ${PWD}/logs_sdw1:/logs
   sdw2:
     <<: *common-service
     hostname: sdw2
     volumes:
-      - ${PWD}/sqldump/dump.sql:/home/gpadmin/sqldump/dump.sql
-      - ${PWD}/ssh_keys/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
-      - ${PWD}/ssh_keys/id_rsa:/home/gpadmin/.ssh/id_rsa
+      - ${PWD}/ssh_keys:/home/gpadmin/.ssh.src
       - ${PWD}/logs_sdw2:/logs
   sdw3:
     <<: *common-service
     hostname: sdw3
     volumes:
-      - ${PWD}/sqldump/dump.sql:/home/gpadmin/sqldump/dump.sql
-      - ${PWD}/ssh_keys/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
-      - ${PWD}/ssh_keys/id_rsa:/home/gpadmin/.ssh/id_rsa
+      - ${PWD}/ssh_keys:/home/gpadmin/.ssh.src
       - ${PWD}/logs_sdw3:/logs
   sdw4:
     <<: *common-service
