@@ -6,45 +6,38 @@ x-common-service: &common-service
   init: true
   ulimits:
     nofile: 65535
-  working_dir: /home/gpadmin
-
   entrypoint: >
     sleep infinity
 
 services:
   cdw:
     <<: *common-service
+    working_dir: /home/gpadmin
     hostname: cdw
     volumes:
       - ${PWD}/allure-results:/tmp/allure-results
       - ${PWD}/sqldump/dump.sql:/home/gpadmin/sqldump/dump.sql
       - ${PWD}/ssh_keys/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
       - ${PWD}/ssh_keys/id_rsa:/home/gpadmin/.ssh/id_rsa
-      - ${PWD}/logs/cdw:/logs
+      - ${PWD}/logs_cdw:/logs
   sdw1:
     <<: *common-service
     hostname: sdw1
     volumes:
-      - ${PWD}/allure-results:/tmp/allure-results
-      - ${PWD}/sqldump/dump.sql:/home/gpadmin/sqldump/dump.sql
       - ${PWD}/ssh_keys/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
       - ${PWD}/ssh_keys/id_rsa:/home/gpadmin/.ssh/id_rsa
-      - ${PWD}/logs/sdw1:/logs
+      - ${PWD}/logs_sdw1:/logs
   sdw2:
     <<: *common-service
     hostname: sdw2
     volumes:
-      - ${PWD}/allure-results:/tmp/allure-results
-      - ${PWD}/sqldump/dump.sql:/home/gpadmin/sqldump/dump.sql
       - ${PWD}/ssh_keys/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
       - ${PWD}/ssh_keys/id_rsa:/home/gpadmin/.ssh/id_rsa
-      - ${PWD}/logs/sdw2:/logs
+      - ${PWD}/logs_sdw2:/logs
   sdw3:
     <<: *common-service
     hostname: sdw3
     volumes:
-      - ${PWD}/allure-results:/tmp/allure-results
-      - ${PWD}/sqldump/dump.sql:/home/gpadmin/sqldump/dump.sql
       - ${PWD}/ssh_keys/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
       - ${PWD}/ssh_keys/id_rsa:/home/gpadmin/.ssh/id_rsa
-      - ${PWD}/logs/sdw3:/logs
+      - ${PWD}/logs_sdw3:/logs
