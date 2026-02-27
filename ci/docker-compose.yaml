@@ -24,7 +24,6 @@ services:
     <<: *common-service
     hostname: sdw1
     volumes:
-      - ${PWD}/sqldump/dump.sql:/home/gpadmin/sqldump/dump.sql
       - ${PWD}/ssh_keys/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
       - ${PWD}/ssh_keys/id_rsa:/home/gpadmin/.ssh/id_rsa
       - ${PWD}/logs_sdw1:/logs
@@ -32,7 +31,6 @@ services:
     <<: *common-service
     hostname: sdw2
     volumes:
-      - ${PWD}/sqldump/dump.sql:/home/gpadmin/sqldump/dump.sql
       - ${PWD}/ssh_keys/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
       - ${PWD}/ssh_keys/id_rsa:/home/gpadmin/.ssh/id_rsa
       - ${PWD}/logs_sdw2:/logs
@@ -40,7 +38,6 @@ services:
     <<: *common-service
     hostname: sdw3
     volumes:
-      - ${PWD}/sqldump/dump.sql:/home/gpadmin/sqldump/dump.sql
       - ${PWD}/ssh_keys/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
       - ${PWD}/ssh_keys/id_rsa:/home/gpadmin/.ssh/id_rsa
       - ${PWD}/logs_sdw3:/logs
