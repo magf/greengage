@@ -6,16 +6,17 @@ x-common-service: &common-service
   init: true
   ulimits:
     nofile: 65535
+  working_dir: /home/gpadmin
   entrypoint: >
     sleep infinity
 
 services:
   cdw:
     <<: *common-service
-    working_dir: /home/gpadmin
     hostname: cdw
     volumes:
       - ${PWD}/allure-results:/tmp/allure-results
+      - ${PWD}/sqldump/dump.sql:/home/gpadmin/sqldump/dump.sql
       - ${PWD}/ssh_keys/id_rsa.pub:/home/gpadmin/.ssh/id_rsa.pub
       - ${PWD}/ssh_keys/id_rsa:/home/gpadmin/.ssh/id_rsa
       - ${PWD}/logs_cdw:/logs
