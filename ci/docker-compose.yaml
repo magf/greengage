@@ -6,13 +6,13 @@ x-common-service: &common-service
   init: true
   ulimits:
     nofile: 65535
+  working_dir: /home/gpadmin
   entrypoint: >
     sleep infinity
 
 services:
   cdw:
     <<: *common-service
-    working_dir: /home/gpadmin
     hostname: cdw
     volumes:
       - ${PWD}/allure-results:/tmp/allure-results
