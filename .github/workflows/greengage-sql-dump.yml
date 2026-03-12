@@ -18,9 +18,12 @@ jobs:
       github.event.workflow_run.conclusion == 'success' &&
       !startsWith(github.event.workflow_run.head_branch, 'refs/tags/')
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        target_os: [ubuntu]
+        include:
+          - target_os: ubuntu
+          - target_os: ubuntu
+            target_os_version: "24.04"
     permissions:
       contents: read  # Explicit for default behavior
       packages: read  # Explicit for GHCR access clarity
@@ -49,35 +52,106 @@ jobs:
       - name: Maximize disk space
         uses: greengagedb/greengage-ci/.github/actions/maximize-disk-space@v19
 
-      - name: Determine version from branch
-        id: version
+      - name: Determine version and construct image name
+        id: image
         env:
           BRANCH: ${{ github.event.workflow_run.head_branch }}
         run: |
           case "$BRANCH" in
             main)
-              echo "version=6" >> $GITHUB_OUTPUT
+              version=6
               ;;
             7.x)
-              echo "version=7" >> $GITHUB_OUTPUT
+              version=7
               ;;
             *)
               echo "Unsupported branch: $BRANCH"
               exit 1
               ;;
           esac
+          image="ghcr.io/${{ github.repository }}/ggdb${version}_${{ matrix.target_os }}${{ matrix.target_os_version }}:${{ github.event.workflow_run.head_sha }}"
+          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "name=${image,,}"  >> $GITHUB_OUTPUT
+
+      - name: Check if Docker image exists
+        id: image-check
+        env:
+          IMAGE: "${{ steps.image.outputs.name }}"
+        run: |
+          if docker manifest inspect "${IMAGE}" > /dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Create SQL Dump via regression tests
-        uses: greengagedb/greengage-ci/.github/actions/tests/regression@v16
+        if: steps.image-check.outputs.exists == 'true'
+        uses: greengagedb/greengage-ci/.github/actions/tests/regression@v25
         with:
-          image: ghcr.io/${{ github.repository }}/ggdb${{ steps.version.outputs.version }}_${{ matrix.target_os }}:${{ github.event.workflow_run.head_sha }}
+          image: ${{ steps.image.outputs.name }}
           optimizer: postgres
           target_os: ${{ matrix.target_os }}
+          target_os_version: ${{ matrix.target_os_version }}
           dump_db: "true"
 
       - name: Upload SQL Dump
+        if: steps.image-check.outputs.exists == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: sqldump_ggdb${{ steps.version.outputs.version }}_${{ matrix.target_os }}
+          name: sqldump_ggdb${{ steps.image.outputs.version }}_${{ matrix.target_os }}${{ matrix.target_os_version }}
           path: /mnt/logs/${{ matrix.target_os }}_postgres_sqldump.tar
           if-no-files-found: error
+
+      - name: Save artifact info for next job
+        if: steps.image-check.outputs.exists == 'true'
+        id: artifact-info
+        run: |
+          echo "artifact_url=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts" >> $GITHUB_OUTPUT
+          echo "artifact_name=sqldump_ggdb${{ steps.image.outputs.version }}_${{ matrix.target_os }}${{ matrix.target_os_version }}" >> $GITHUB_OUTPUT
+
+    outputs:
+      artifact_name: ${{ steps.artifact-info.outputs.artifact_name }}
+      artifact_url: ${{ steps.artifact-info.outputs.artifact_url }}
+      exists: ${{ steps.image-check.outputs.exists }}
+
+  verify-and-report:
+    runs-on: ubuntu-latest
+    needs: create-sql-dump-regression
+    if: always()
+    steps:
+      - name: Verify and report SQL dumps
+        env:
+          EXISTS: "${{ needs.create-sql-dump-regression.outputs.exists }}"
+          ARTIFACT_NAME: "${{ needs.create-sql-dump-regression.outputs.artifact_name }}"
+          ARTIFACT_URL: "${{ needs.create-sql-dump-regression.outputs.artifact_url }}"
+        run: |
+          cat << EOF
+          ==================== SQL Dump Creation Report ====================
+          Matrix results:
+            EXISTS=${EXISTS}
+            ARTIFACT_NAME=${ARTIFACT_NAME}
+            ARTIFACT_URL=${ARTIFACT_URL}
+          ==================================================================
+          EOF
+
+          # Count successful creations (comma-separated values from matrix)
+          success_count=0
+          total_count=0
+
+          IFS=',' read -ra exists_arr <<< "${EXISTS}"
+          for exists in "${exists_arr[@]}"; do
+            total_count=$((total_count + 1))
+            if [ "${exists}" = "true" ]; then
+              success_count=$((success_count + 1))
+            fi
+          done
+
+          echo ""
+          echo "::notice::Summary: ${success_count}/${total_count} dumps created"
+
+          if [ ${success_count} -eq 0 ]; then
+            echo "::error::No SQL dumps were created - no images found"
+            exit 1
+          else
+            echo "✓ At least one SQL dump created successfully"
+          fi

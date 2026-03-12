@@ -84,9 +84,20 @@ automatically upon the completion of the `Greengage CI` workflow.
 - **Branch Targeting:** Runs only for the `main` and `7.x` branches.
 - **Version Detection:** Automatically determines the database version (6 or 7)
 based on the triggering branch.
-- **Artifact Creation:** Executes regression tests with the `dump_db: "true"`
-parameter to generate a SQL dump archive, which is then uploaded as a workflow
-artifact.
+- **Matrix Strategy:** Runs across multiple OS configurations (e.g., `ubuntu`,
+`ubuntu24.04`) to generate dumps for all available build targets.
+- **Image Existence Check:** Before creating a SQL dump, the workflow checks
+if the Docker image exists in GHCR using `docker manifest inspect`. This handles
+cases where the matrix includes OS versions for which no image was built.
+- **Conditional Dump Generation:** If the image exists, the workflow runs the
+regression test suite with the `dump_db: "true"` parameter to generate a SQL
+dump archive. If the image does not exist, the dump creation and upload steps
+are skipped for that matrix entry.
+- **Artifact Upload:** Uploads the generated SQL dump archive as a named
+artifact (e.g., `sqldump_ggdb7_ubuntu24.04`).
+- **Verification Job:** A final job checks if at least one SQL dump was created
+across all matrix configurations. If no images were found (and thus no dumps
+created), the workflow fails with an error.
 - **Controlled Execution:** Since the main CI workflow runs on `main` and `7.x`
 branches only for push events (which occur after final merge of a PR), SQL dump
 are generated exclusively for verified, approved patches after they are merged
@@ -103,12 +114,23 @@ finishes on the `main` or `7.x` branch.
 2. **Preparation:** Configures Docker storage on the runner to utilize
 `/mnt/docker` for increased disk space.
 3. **Version Mapping:** Maps the branch name (`main` -> version 6, `7.x` ->
-version 7) to select the correct Docker image for testing.
-4. **Dump Generation:** Runs the regression test suite using the reusable
-action with the `dump_db` option enabled, which creates a
-`*_postgres_sqldump.tar` file.
-5. **Artifact Upload:** Uploads the generated SQL dump archive as a named
-artifact (e.g., `sqldump_ggdb7_ubuntu`) to the workflow run.
+version 7) and constructs the expected Docker image name.
+4. **Image Existence Check:** For each matrix entry, checks if the Docker image
+exists in GHCR using `docker manifest inspect`. Sets `exists=true` if found,
+`exists=false` otherwise.
+5. **Conditional Dump Generation:** If `exists=true`, runs the regression test
+suite with the `dump_db` option enabled, which creates a `*_postgres_sqldump.tar`
+file. If `exists=false`, skips dump creation for that matrix entry.
+6. **Artifact Upload:** If `exists=true`, uploads the generated SQL dump archive
+as a named artifact (e.g., `sqldump_ggdb7_ubuntu24.04`).
+7. **Artifact Info Export:** Saves artifact name and URL to job outputs for
+use by the verification job.
+8. **Verification and Report:** A final verification job:
+   - Collects results from all matrix entries
+   - Displays a report with artifact names and URLs
+   - Counts successful dump creations
+   - Fails the workflow if no dumps were created (zero images found)
+   - Succeeds if at least one dump was created
 
 This workflow ensures that a current database schema dump is available as an
 artifact following successful CI runs on the primary branches `main` and `7.x`.
@@ -157,8 +179,9 @@ of the `greengagedb/greengage-ci` repository. For example:
 
 ## Notes
 
-- The pipeline uses a `fail-fast: true` strategy to stop on any matrix job
-  failure, ensuring quick feedback.
+- The pipeline uses a `fail-fast: false` strategy to ensure all matrix entries
+  are executed, even if one fails. This allows the SQL Dump workflow to check
+  all OS configurations and skip missing images gracefully.
 - The full process, including build, tests, and upload, runs only before pull
   request approval. For push events (main or tags), a build occurs to ensure
   correct commit references and product version, using the closest tag to HEAD,
