@@ -152,6 +152,4 @@ jobs:
           if [ ${success_count} -eq 0 ]; then
             echo "::error::No SQL dumps were created - no images found"
             exit 1
-          else
-            echo "✓ At least one SQL dump created successfully"
           fi
