@@ -1,9 +1,9 @@
-# Main CI pipeline orchestrating build, test, and upload stages
+# .github/workflows/greengage-ci.yml
 name: Greengage CI
 
 on:
   push:
-    branches: ['main']  # Trigger on push to main (after merged PR)
+    branches: ['6.x']  # Trigger on push to 6.x (after merged PR)
     tags: ['6.*']   # Trigger on tags for versioned releases
   pull_request:
     branches: ['**'] # Trigger on pull requests for all branches
@@ -26,7 +26,7 @@ jobs:
       contents: read  # Explicit for default behavior
       packages: write # Required for GHCR access
       actions: write  # Required for artifact upload
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-build.yml@CI-5269
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-build.yml@v25
     with:
       version: 6
       target_os: ${{ matrix.target_os }}
