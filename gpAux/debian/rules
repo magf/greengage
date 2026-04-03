@@ -5,10 +5,8 @@ DH_VERBOSE = 1
 export DH_OPTIONS = -v
 export DEB_BUILD_OPTIONS = nocheck
 
-DEPS = python3
-
 %:
-	dh $@
+	dh $@ --with python3
 
 override_dh_auto_clean:
 	@echo "Skipping clean"
@@ -39,7 +37,3 @@ override_dh_fixperms:
 	        chmod -x "$$f"; \
 	    fi; \
 	done
-
-override_dh_gencontrol:
-	@echo "=== GENCONTROL GPROOT=$(GPROOT), GPDIR=$(GPDIR), PACKAGE_NAME=$(PACKAGE_NAME) ==="
-	dh_gencontrol -- -VpythonRequires="$(DEPS)" -VpythonConflicts="$(CONFLICTS)"
