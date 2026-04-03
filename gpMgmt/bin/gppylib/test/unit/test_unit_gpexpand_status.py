@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 # pylint: disable=invalid-name, missing-docstring, too-few-public-methods
 #
 # Copyright (c) 2019-Present VMware, Inc. or its affiliates.

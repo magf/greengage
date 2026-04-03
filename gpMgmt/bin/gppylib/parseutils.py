@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 # Line too long            - pylint: disable=C0301
 # Invalid name             - pylint: disable=C0103
 

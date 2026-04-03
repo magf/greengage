@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 #
 # Copyright (c) Greenplum Inc 2013. All Rights Reserved. 
 #

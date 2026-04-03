@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 from mock import Mock, patch, call,  MagicMock
 from gppylib.test.unit.gp_unittest import GpTestCase, run_tests, FakeCursor

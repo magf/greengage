@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 '''
 Tool to validate replication consistency between primary and mirror.

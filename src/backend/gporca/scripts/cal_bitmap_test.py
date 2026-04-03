@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 # Optimizer calibration test for bitmap and brin indexes, also btree on AO tables
 #

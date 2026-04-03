@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 #-*- coding: utf-8 -*-
 
 # This is just to test we can use dbconn to connect a database
