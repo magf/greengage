@@ -26,6 +26,12 @@ override_dh_auto_install:
 		GPDIR=$(GPDIR) \
 		PARALLEL_MAKE_OPTS=-j$(shell nproc)
 
+override_dh_python3:
+	@dh_python3 -v
+
+override_dh_perl:
+	@dh_perl -v
+
 override_dh_dwz:
 	@echo "Skipping dwz"
 
@@ -37,3 +43,7 @@ override_dh_fixperms:
 	        chmod -x "$$f"; \
 	    fi; \
 	done
+
+override_dh_gencontrol:
+	@echo "=== GENCONTROL GPROOT=$(GPROOT), GPDIR=$(GPDIR), PACKAGE_NAME=$(PACKAGE_NAME) ==="
+	dh_gencontrol -v
