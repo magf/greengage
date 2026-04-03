@@ -49,6 +49,7 @@ apt-get install -y \
 	protobuf-compiler \
 	python3.11 \
 	python3.11-dev \
+	python3-all \
 	python3-dev \
 	python3-pip \
 	python3-psutil \
