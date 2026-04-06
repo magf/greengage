@@ -30,7 +30,7 @@ override_dh_python3:
 	@dh_python3 -v ../
 
 override_dh_perl:
-	@dh_perl -v
+	@dh_perl -v ../
 
 override_dh_dwz:
 	@echo "Skipping dwz"
@@ -46,4 +46,6 @@ override_dh_fixperms:
 
 override_dh_gencontrol:
 	@echo "=== GENCONTROL GPROOT=$(GPROOT), GPDIR=$(GPDIR), PACKAGE_NAME=$(PACKAGE_NAME) ==="
+	@echo "=== SUBVARS debian/greengage7.substvars"
+	@cat debian/greengage7.substvars
 	dh_gencontrol -v
