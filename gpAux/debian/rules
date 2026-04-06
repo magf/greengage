@@ -27,7 +27,7 @@ override_dh_auto_install:
 		PARALLEL_MAKE_OPTS=-j$(shell nproc)
 
 override_dh_python3:
-	@dh_python3 -v
+	@dh_python3 -v ../
 
 override_dh_perl:
 	@dh_perl -v
