@@ -11,6 +11,7 @@ Priority: optional
 Architecture: any
 Depends: ${shlibs:Depends},
 	 ${misc:Depends},
+	 ${perl:Depends},
 	 ${python3:Depends},
 	 iproute2,
 	 iputils-ping,
