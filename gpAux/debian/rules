@@ -4,8 +4,7 @@
 DH_VERBOSE = 1
 export DH_OPTIONS = -v
 export DEB_BUILD_OPTIONS = nocheck
-
-DEPS = python3
+export PATH := /usr/local/bin:$(PATH)
 
 %:
 	dh $@
@@ -42,4 +41,19 @@ override_dh_fixperms:
 
 override_dh_gencontrol:
 	@echo "=== GENCONTROL GPROOT=$(GPROOT), GPDIR=$(GPDIR), PACKAGE_NAME=$(PACKAGE_NAME) ==="
-	dh_gencontrol -- -VpythonRequires="$(DEPS)" -VpythonConflicts="$(CONFLICTS)"
+	$(eval IGNORE_DIRS := $(shell \
+		grep 'path = ' ../.gitmodules 2>/dev/null \
+		| awk '{print $$3}' \
+		| tr '\n' ','))
+	@pip install pipreqs &>/dev/null
+	@pipreqs --print --ignore "../$(IGNORE_DIRS)" .. 2>/dev/null \
+		| cut -d= -f1 \
+		| tr '[:upper:]_' '[:lower:]-' \
+		| sort -u \
+		| sed 's/^/python3-/' \
+		| tr '\n' ',' \
+		| sed 's/,$$//;s/,/, /g' > /tmp/python_deps
+	@cat /tmp/python_deps
+	@test -s /tmp/python_deps || (echo "ERROR: pipreqs returned empty dependencies" && exit 1)
+	@echo "pythonRequires=$$(cat /tmp/python_deps)" >> debian/$(PACKAGE_NAME).substvars
+	dh_gencontrol -v
