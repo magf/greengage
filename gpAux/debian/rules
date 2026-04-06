@@ -39,7 +39,10 @@ override_dh_python3:
 		| sort -u > /tmp/requirements.txt
 	@test -s /tmp/requirements.txt || (echo "ERROR: pipreqs returned empty requirements" && cat /tmp/pipreqs.log && exit 1)
 	cat /tmp/requirements.txt
-	dh_python3 --no-shebang-rewrite --requires=/tmp/requirements.txt ..
+	dh_python3 \
+	 --no-ext-rename \
+	 --no-shebang-rewrite \
+	 --requires=/tmp/requirements.txt ..
 
 override_dh_perl:
 	dh_perl ..
