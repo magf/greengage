@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 from gppylib.operations.validate_disk_space import RelocateSegmentPair, RelocateDiskUsage, FileSystem
 from gppylib.test.unit.gp_unittest import GpTestCase, run_tests

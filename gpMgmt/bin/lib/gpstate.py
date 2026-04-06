@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 #
 # Recovers Greengage segment instances that are marked as invalid, if
 # mirroring is configured and operational

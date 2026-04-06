@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 class UniqueIndexViolationCheck:
     unique_indexes_query = """

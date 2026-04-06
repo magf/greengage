@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 from contextlib import closing
 from gppylib.db import dbconn
 from gppylib.db.catalog import RemoteQueryCommand

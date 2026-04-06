@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 #
 # Extracts summary info from a log file that compiles and executes test suite
 # queries. Creates a CSV (comma-separated values) summary.

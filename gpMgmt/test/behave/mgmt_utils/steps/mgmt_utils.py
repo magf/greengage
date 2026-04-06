@@ -4227,7 +4227,7 @@ EOL
 """
     clear_cmd_cache_script = """
 cat >/tmp/clear_cmd_cache.py <<EOL
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 # clear the cmd cache
 global CMD_CACHE

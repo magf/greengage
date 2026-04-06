@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 from gppylib import gplog
 from gppylib.db.catalog import RemoteQueryCommand
