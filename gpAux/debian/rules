@@ -4,6 +4,7 @@
 DH_VERBOSE = 1
 export DH_OPTIONS = -v
 export DEB_BUILD_OPTIONS = nocheck
+export PATH := /usr/local/bin:$(PATH)
 
 %:
 	dh $@ --with python3
@@ -27,10 +28,21 @@ override_dh_auto_install:
 		PARALLEL_MAKE_OPTS=-j$(shell nproc)
 
 override_dh_python3:
-	@dh_python3 -v ../
+	@pip install pipreqs 2>/dev/null
+	@$(eval IGNORE_DIRS := $(shell \
+		grep 'path = ' ../.gitmodules 2>/dev/null \
+		| awk '{print $$3}' \
+		| tr '\n' ','))
+	@pipreqs --print --ignore "$(IGNORE_DIRS)" .. 2>/tmp/pipreqs.log \
+		| grep '==' \
+		| cut -d= -f1 \
+		| sort -u > /tmp/requirements.txt
+	@test -s /tmp/requirements.txt || (echo "ERROR: pipreqs returned empty requirements" && cat /tmp/pipreqs.log && exit 1)
+	cat /tmp/requirements.txt
+	dh_python3 --no-shebang-rewrite --requires=/tmp/requirements.txt ..
 
 override_dh_perl:
-	@dh_perl -v ../
+	dh_perl ..
 
 override_dh_dwz:
 	@echo "Skipping dwz"
@@ -46,6 +58,6 @@ override_dh_fixperms:
 
 override_dh_gencontrol:
 	@echo "=== GENCONTROL GPROOT=$(GPROOT), GPDIR=$(GPDIR), PACKAGE_NAME=$(PACKAGE_NAME) ==="
-	@echo "=== SUBVARS debian/greengage7.substvars"
-	@cat debian/greengage7.substvars
-	dh_gencontrol -v
+	@echo "=== SUBVARS debian/$(PACKAGE_NAME).substvars"
+	@cat debian/$(PACKAGE_NAME).substvars
+	dh_gencontrol

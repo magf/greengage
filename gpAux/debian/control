@@ -4,6 +4,7 @@ Section: database
 Build-Depends: debhelper (>= 13),
 	 dh-python,
 	 python3-all,
+	 python3-pip,
 	 lsb-release
 
 Package: greengage7
@@ -16,12 +17,12 @@ Depends: ${shlibs:Depends},
 	 iproute2,
 	 iputils-ping,
 	 less,
+	 net-tools,
 	 openssh-client,
 	 openssh-server,
 	 openssl,
 	 rsync,
-	 zip,
-	 net-tools
+	 zip
 Breaks: ${python3:Breaks}
 Conflicts: greengage-loaders
 Description: Greengage MPP database engine
