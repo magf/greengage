@@ -10,10 +10,11 @@ shared-library-lacks-prerequisites
 # but they do not require the executable bit in a production package.
 script-not-executable [opt/greengagedb/greengage6/lib/python/*]
 
-# lib/python/ modules use bare 'python' interpreter. On Ubuntu 22.04,
-# python(1) is a symlink to python2, created at build time.
-unusual-interpreter /usr/bin/python [opt/greengagedb/greengage6/lib/python/*]
-unusual-interpreter python [opt/greengagedb/greengage6/bin/*]
+# bin/, sbin/, lib/python/ modules use bare 'python' interpreter.
+# On Ubuntu 22.04 python(1) is a symlink to python2, created at build time.
+script-uses-unversioned-python-in-shebang [opt/greengagedb/greengage6/*bin/*]
+unusual-interpreter *python [opt/greengagedb/greengage6/lib/python/*]
+unusual-interpreter  python [opt/greengagedb/greengage6/*bin/*]
 
 # These Perl test scripts use '#!/usr/bin/env perl' for portability across
 # environments where Perl is not at /usr/bin/perl (e.g. NixOS, custom builds).
