@@ -52,6 +52,7 @@ override_dh_fixperms:
 	        chmod -x "$$f"; \
 	    fi; \
 	done
+	find $(CURDIR)/debian/$(PACKAGE_NAME) -name "*.md" -executable | xargs chmod -x
 
 override_dh_gencontrol:
 	@echo "=== GENCONTROL GPROOT=$(GPROOT), GPDIR=$(GPDIR), PACKAGE_NAME=$(PACKAGE_NAME) ==="
