@@ -4,12 +4,15 @@ dir-or-file-in-opt
 # Not applicable for plugins
 shared-library-lacks-prerequisites
 
-# lib/python/ contains gppylib/pygresql library modules that are imported via
-# Python's import system, not executed directly. These files have shebangs as a
+# lib/python/ contains gppylib library modules that are imported via Python's
+# import system, not executed directly. These files have shebangs as a
 # developer convenience (allows running them standalone during debugging),
 # but they do not require the executable bit in a production package.
 script-not-executable [opt/greengagedb/greengage6/lib/python/*]
-unusual-interpreter [opt/greengagedb/greengage6/lib/python/*]
+
+# lib/python/ modules use bare 'python' interpreter. On Ubuntu 22.04,
+# python(1) is provided via python-is-python2 or python-is-python3 package.
+unusual-interpreter *python [opt/greengagedb/greengage6/lib/python/*]
 
 # These Perl test scripts use '#!/usr/bin/env perl' for portability across
 # environments where Perl is not at /usr/bin/perl (e.g. NixOS, custom builds).
