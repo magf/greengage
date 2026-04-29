@@ -8,6 +8,7 @@ on:
     branches:
       - 6.x
       - 7.x
+      - next
 
 env:
   RUN_ID: ${{ github.event.workflow_run.id }}
@@ -17,8 +18,9 @@ env:
   RUN_HEAD_COMMIT_MESSAGE: ${{ github.event.workflow_run.head_commit.message }}
   RUN_HEAD_COMMIT_AUTHOR: ${{ github.event.workflow_run.head_commit.author.name }}
   VERSION: ${{ case(
-    github.event.workflow_run.head_branch == '6.x', '6',
-    github.event.workflow_run.head_branch == '7.x', '7',
+    github.event.workflow_run.head_branch == '6.x',  '6',
+    github.event.workflow_run.head_branch == '7.x',  '7',
+    github.event.workflow_run.head_branch == 'next', '8',
     ''
     ) }}
 
