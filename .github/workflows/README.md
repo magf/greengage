@@ -93,11 +93,12 @@ automatically upon the completion of the `Greengage CI` workflow.
   branch-specific itself, the version is derived at runtime from the branch of
   the triggering `Greengage CI` run.
 - **Branch-driven OS Configuration:** Instead of a matrix strategy, the target
-  OS and its version are determined at runtime from the triggering branch:
+  OS and its version are determined at runtime from the triggering branch via
+  workflow-level environment variables `TARGET_OS` and `TARGET_OS_VERSION`:
   - `6.x` → `ubuntu 24.04`
   - `7.x` → `ubuntu` (no version suffix — compatible with Ubuntu 22.04
     artifact naming)
-  - `next` → `rockylinux 8`
+  - `next` → `ubuntu` (no version suffix)
 - **Image Pull Check:** Before creating a SQL dump, the workflow attempts to
   pull the Docker image from GHCR. If the pull fails, the dump creation and
   upload steps are skipped without failing the job.
@@ -105,8 +106,7 @@ automatically upon the completion of the `Greengage CI` workflow.
   workflow runs the regression test suite with the `dump_db: "true"` parameter
   to generate a SQL dump archive.
 - **Artifact Upload:** Uploads the generated SQL dump archive as a named
-  artifact (e.g., `sqldump_ggdb6_ubuntu24.04`, `sqldump_ggdb7_ubuntu`,
-  `sqldump_ggdb8_rockylinux8`).
+  artifact (e.g., `sqldump_ggdb6_ubuntu24.04`, `sqldump_ggdb7_ubuntu`).
 - **Verification Job:** A final job checks if the SQL dump was created by
   querying the GitHub Actions jobs API. If no dump was uploaded, the workflow
   fails with an error.
@@ -145,7 +145,7 @@ automatically upon the completion of the `Greengage CI` workflow.
    did not.
 
 This workflow ensures that a current database schema dump is available as an
-artifact following successful CI runs on the primary branches `6.x` and `7.x`,
+artifact following successful CI runs on the primary branches `6.x`, `7.x`,
 and `next`.
 
 ## Configuration

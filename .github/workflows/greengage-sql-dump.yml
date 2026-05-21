@@ -23,8 +23,8 @@ env:
     github.event.workflow_run.head_branch == 'next', '8',
     ''
     ) }}
-  TARGET_OS: ${{ github.event.workflow_run.head_branch == 'next' && 'rockylinux' || 'ubuntu' }}
-  TARGET_OS_VERSION: ${{ (github.event.workflow_run.head_branch == '6.x' && '24.04') || (github.event.workflow_run.head_branch == 'next' && '8') || '' }}
+  TARGET_OS: 'ubuntu'
+  TARGET_OS_VERSION: ${{ github.event.workflow_run.head_branch == '6.x' && '24.04' || '' }}
 
 jobs:
   create-sql-dump-regression:
