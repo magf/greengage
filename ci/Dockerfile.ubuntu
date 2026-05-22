@@ -1,0 +1,75 @@
+ARG OS_VERSION=22.04
+
+FROM ubuntu:${OS_VERSION} AS base
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+WORKDIR /home/gpadmin
+
+ARG UBUNTU_MAIN_MIRROR=http://archive.ubuntu.com/ubuntu
+ARG UBUNTU_UPDATES_MIRROR=http://archive.ubuntu.com/ubuntu
+ARG UBUNTU_BACKPORTS_MIRROR=http://archive.ubuntu.com/ubuntu
+ARG UBUNTU_SECURITY_MIRROR=http://security.ubuntu.com/ubuntu
+
+COPY README.Ubuntu.bash ./
+
+RUN set -eux; \
+    . /etc/os-release; \
+    sed -i \
+      -e "s|http://archive.ubuntu.com/ubuntu/  ${UBUNTU_CODENAME} |${UBUNTU_MAIN_MIRROR}/ ${UBUNTU_CODENAME} |g" \
+      -e "s|http://archive.ubuntu.com/ubuntu/  ${UBUNTU_CODENAME}-updates |${UBUNTU_UPDATES_MIRROR}/ ${UBUNTU_CODENAME}-updates |g" \
+      -e "s|http://archive.ubuntu.com/ubuntu/  ${UBUNTU_CODENAME}-backports |${UBUNTU_BACKPORTS_MIRROR}/ ${UBUNTU_CODENAME}-backports |g" \
+      -e "s|http://security.ubuntu.com/ubuntu/ ${UBUNTU_CODENAME}-security |${UBUNTU_SECURITY_MIRROR}/ ${UBUNTU_CODENAME}-security |g" \
+      /etc/apt/sources.list; \
+    ./README.Ubuntu.bash; \
+    rm README.Ubuntu.bash; \
+# The en_US.UTF-8 locale is needed to run GPDB
+    locale-gen en_US.UTF-8; \
+# To run sshd directly, but not using `/etc/init.d/ssh start`
+    mkdir /run/sshd; \
+# Alter precedence in favor of IPv4 during resolving
+    echo 'precedence ::ffff:0:0/96  100' >> /etc/gai.conf; \
+# Install allure-behave for behave tests
+    PYTHON_PIP_FLAGS="--no-cache-dir --prefer-binary"; \
+    if [ "$VERSION_ID" = "24.04" ]; then \
+        PYTHON_PIP_FLAGS="$PYTHON_PIP_FLAGS --break-system-packages --ignore-installed"; \
+    fi; \
+    pip3 install $PYTHON_PIP_FLAGS \
+      allure-behave==2.4.0 \
+      behave~=1.2.6 \
+      coverage~=4.5 \
+      'gsutil<=5.37' \
+      'mock<=5.0.0' \
+      protobuf==3.20.0 \
+      PyGreSQL==6.1.0 \
+      'pytest<=9.0.0'; \
+    apt-get clean; \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/man/
+
+RUN mkdir -p .ssh/ && cat >> .ssh/config <<-EOF
+Host *
+    StrictHostKeyChecking no
+EOF
+
+FROM base AS build
+
+COPY . gpdb_src
+
+RUN mkdir bin_gpdb
+
+ARG SKIP_UNITTESTS
+ENV OUTPUT_ARTIFACT_DIR=bin_gpdb \
+    SKIP_UNITTESTS=$SKIP_UNITTESTS \
+# To set default locale for unittests
+    LANG=en_US.UTF-8 \
+    CONFIGURE_FLAGS="--enable-debug-extensions --with-gssapi --with-llvm --with-openssl --enable-cassert --enable-debug --enable-depend --with-libxml --with-uuid=ossp --with-perl --enable-mapreduce --enable-orafce"
+
+# Compile with running mocking tests
+RUN gpdb_src/concourse/scripts/compile_gpdb.bash
+
+FROM base AS code
+COPY . gpdb_src
+RUN rm -rf gpdb_src/.git/
+
+FROM base AS test
+COPY --from=code /home/gpadmin/gpdb_src gpdb_src
+COPY --from=build /home/gpadmin/bin_gpdb /home/gpadmin/bin_gpdb
+COPY --from=build /home/gpadmin/gpdb_src/VERSION gpdb_src
