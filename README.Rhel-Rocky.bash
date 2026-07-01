@@ -70,6 +70,7 @@ dnf -y install \
     pam-devel \
     procps-ng \
     readline-devel \
+    rpm-build \
     rsync \
     snappy-devel \
     sudo \
