@@ -421,7 +421,7 @@ diff_and_exit() {
 	# src/test/perl/PostgreSQL/Test/AdjustUpgrade.pm
 	# But it performs many other substitutions, and because cross-version testing is currently
 	# broken for other reasons, it is hard to judge whether we need all of them.
-	sed -i "s/Dumped from database version [0-9.]*$/Dumped from database version XXX/g" $temp_root/dump1.sql $temp_root/dump2.sql
+	# sed -i "s/Dumped from database version [0-9.]*$/Dumped from database version XXX/g" $temp_root/dump1.sql $temp_root/dump2.sql
 	
 	# Since we've used the same pg_dump binary to create both dumps, whitespace
 	# shouldn't be a cause of difference in the files but it is. Partitioning info
