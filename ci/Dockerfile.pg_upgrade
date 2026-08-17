@@ -4,12 +4,14 @@ ARG GGDB6_IMAGE=ghcr.io/greengagedb/greengage/ggdb6_ubuntu:latest
 ARG GGDB7_IMAGE=ghcr.io/greengagedb/greengage/ggdb7_ubuntu:latest
 
 FROM $GGDB6_IMAGE AS ggdb6
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN set -eux; \
-    source gpdb_src/concourse/scripts/common.bash; \
+    . gpdb_src/concourse/scripts/common.bash; \
     install_and_configure_gpdb
 
 FROM $GGDB7_IMAGE
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 ENV GREENGAGE6_SRC=/home/gpadmin/ggdb6_src \
     GREENGAGE7_SRC=/home/gpadmin/gpdb_src \
@@ -19,20 +21,22 @@ ENV GREENGAGE6_SRC=/home/gpadmin/ggdb6_src \
 COPY --from=ggdb6 --chown=1000:1000 /home/gpadmin/gpdb_src $GREENGAGE6_SRC
 COPY --from=ggdb6 --chown=1000:1000 /usr/local/greengage-db-devel $GREENGAGE6_INSTALLATION
 
+# hadolint ignore=DL3008
 RUN set -eux; \
     . /etc/os-release; \
-    apt update; \
+    apt-get update; \
     if [ "$VERSION_ID" = "22.04" ]; then \
-      apt install python2 python2-dev python-pip -y; \
+      apt-get install -y --no-install-recommends python2 python2-dev python-pip; \
       ln -sf /bin/python2 /bin/python; \
-      python -m pip install future==0.16; \
+      python -m pip --no-cache-dir install future==0.16; \
     else \
-      apt install python-is-python3; \
-      python -m pip install future==1.0.0; \
-    fi
+      apt-get install -y --no-install-recommends python-is-python3; \
+      python -m pip --no-cache-dir install future==1.0.0; \
+    fi; \
+    rm -rf /var/lib/apt/lists/*
 
 RUN set -eux; \
     export CONFIGURE_FLAGS=; \
-    source gpdb_src/concourse/scripts/common.bash; \
+    . gpdb_src/concourse/scripts/common.bash; \
     install_and_configure_gpdb; \
     chown -R 1000:1000 $GREENGAGE7_INSTALLATION
