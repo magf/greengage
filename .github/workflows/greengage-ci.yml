@@ -34,6 +34,9 @@ jobs:
     needs: build
     if: github.event_name == 'pull_request'  # Only for PR
     uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-pg_upgrade.yml@CI-6130
+    with:
+      cleanup_script: ''
+      dump_options: ''
     secrets:
       ghcr_token: ${{ secrets.GITHUB_TOKEN }}
 
