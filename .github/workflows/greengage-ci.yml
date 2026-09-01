@@ -36,6 +36,8 @@ jobs:
     uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-pg_upgrade.yml@CI-6130
     secrets:
       ghcr_token: ${{ secrets.GITHUB_TOKEN }}
+    with:
+      dump_options: ''
 
   # behave-tests:
   #   needs: build  # Wait for build to complete
