@@ -25,7 +25,7 @@ RUN set -eux; \
 # Alter precedence in favor of IPv4 during resolving
     echo 'precedence ::ffff:0:0/96  100' >> /etc/gai.conf; \
 # Install Python packages
-    pip3 install --no-cache-dir --prefer-binary \
+    pip3 install --no-cache-dir --prefer-binary --ignore-installed \
       allure-behave==2.4.0 \
       behave~=1.2.6 \
       coverage~=4.5 \
