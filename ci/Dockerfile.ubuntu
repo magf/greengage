@@ -6,16 +6,9 @@ WORKDIR /home/gpadmin
 
 ARG OS_VERSION \
     CONFIGURE_FLAGS="--enable-debug-extensions --with-gssapi --enable-cassert --enable-debug --enable-depend" \
+    LOCALE=en_US.UTF-8 \
     OUTPUT_ARTIFACT_DIR=bin_gpdb \
     SKIP_UNITTESTS=
-
-ENV LANG=en_US.UTF-8 \
-    OS_VERSION=$OS_VERSION \
-    TARGET_OS=ubuntu \
-    TARGET_OS_VERSION=$OS_VERSION \
-    CONFIGURE_FLAGS=$CONFIGURE_FLAGS \
-    OUTPUT_ARTIFACT_DIR=$OUTPUT_ARTIFACT_DIR \
-    SKIP_UNITTESTS=$SKIP_UNITTESTS
 
 COPY README.Ubuntu.bash ./
 
@@ -23,8 +16,8 @@ RUN set -eux; \
     ./README.Ubuntu.bash; \
     rm -rf /var/lib/apt/lists/*; \
     rm README.Ubuntu.bash; \
-# The en_US.UTF-8 locale is needed to run GPDB
-    locale-gen en_US.UTF-8; \
+# The $LOCALE locale is needed to run GPDB
+    locale-gen "$LOCALE"; \
 # To run sshd directly, but not using `/etc/init.d/ssh start`
     mkdir /run/sshd; \
 # Alter precedence in favor of IPv4 during resolving
@@ -38,6 +31,14 @@ RUN set -eux; \
       'mock<=5.0.0' \
       protobuf==3.20.0 \
       'pytest<=9.0.0'
+
+ENV LANG=$LOCALE \
+    OS_VERSION=$OS_VERSION \
+    TARGET_OS=ubuntu \
+    TARGET_OS_VERSION=$OS_VERSION \
+    CONFIGURE_FLAGS=$CONFIGURE_FLAGS \
+    OUTPUT_ARTIFACT_DIR=$OUTPUT_ARTIFACT_DIR \
+    SKIP_UNITTESTS=$SKIP_UNITTESTS
 
 FROM base AS build
 
