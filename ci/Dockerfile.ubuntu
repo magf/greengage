@@ -5,7 +5,6 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 WORKDIR /home/gpadmin
 
 ARG CONFIGURE_FLAGS="--enable-debug-extensions --with-gssapi --enable-cassert --enable-debug --enable-depend" \
-    LOCALE=en_US.UTF-8 \
     OUTPUT_ARTIFACT_DIR=bin_gpdb \
     SKIP_UNITTESTS=
 
@@ -17,8 +16,8 @@ RUN set -eux; \
     ./README.Ubuntu.bash; \
     rm -rf /var/lib/apt/lists/*; \
     rm README.Ubuntu.bash; \
-# The $LOCALE locale is needed to run GPDB
-    locale-gen "$LOCALE"; \
+# The en_US.UTF-8 locale is needed to run GPDB
+    locale-gen en_US.UTF-8; \
 # To run sshd directly, but not using `/etc/init.d/ssh start`
     mkdir /run/sshd; \
 # Alter precedence in favor of IPv4 during resolving
@@ -33,7 +32,7 @@ RUN set -eux; \
       protobuf==3.20.0 \
       'pytest<=9.0.0'
 
-ENV LANG=$LOCALE \
+ENV LANG=en_US.UTF-8 \
     TARGET_OS=ubuntu \
     CONFIGURE_FLAGS=$CONFIGURE_FLAGS \
     OUTPUT_ARTIFACT_DIR=$OUTPUT_ARTIFACT_DIR \
