@@ -34,6 +34,13 @@ jobs:
     secrets:
       ghcr_token: ${{ secrets.GITHUB_TOKEN }}
 
+  pg_upgrade-test:
+    needs: build
+    if: github.event_name == 'pull_request'  # Only for PR
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-pg_upgrade.yml@v56
+    secrets:
+      ghcr_token: ${{ secrets.GITHUB_TOKEN }}
+
   behave-tests:
     needs: build  # Wait for build to complete
     if: github.event_name == 'pull_request'  # Only for PR
@@ -52,7 +59,7 @@ jobs:
     secrets:
       ghcr_token: ${{ secrets.GITHUB_TOKEN }}
 
-  jit-tests:
+  regression-tests:
     needs: build
     if: github.event_name == 'pull_request'  # Only for PR
     strategy:
@@ -63,7 +70,7 @@ jobs:
       contents: read  # Explicit for default behavior
       packages: read  # Explicit for GHCR access clarity
       actions: write  # Required for artifact upload
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-jit.yml@v51
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-regression.yml@v51
     with:
       version: 7
       target_os: ${{ matrix.target_os }}
@@ -88,31 +95,6 @@ jobs:
     secrets:
       ghcr_token: ${{ secrets.GITHUB_TOKEN }}
 
-  pg_upgrade-test:
-    needs: build
-    if: github.event_name == 'pull_request'  # Only for PR
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-pg_upgrade.yml@v56
-    secrets:
-      ghcr_token: ${{ secrets.GITHUB_TOKEN }}
-
-  regression-tests:
-    needs: build
-    if: github.event_name == 'pull_request'  # Only for PR
-    strategy:
-      fail-fast: false
-      matrix:
-        target_os: [ubuntu]
-    permissions:
-      contents: read  # Explicit for default behavior
-      packages: read  # Explicit for GHCR access clarity
-      actions: write  # Required for artifact upload
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-regression.yml@v51
-    with:
-      version: 7
-      target_os: ${{ matrix.target_os }}
-    secrets:
-      ghcr_token: ${{ secrets.GITHUB_TOKEN }}
-
   resgroup-tests:
     needs: build
     if: github.event_name == 'pull_request'  # Only for PR
@@ -131,23 +113,21 @@ jobs:
     secrets:
       ghcr_token: ${{ secrets.GITHUB_TOKEN }}
 
-  package:
+  jit-tests:
     needs: build
+    if: github.event_name == 'pull_request'  # Only for PR
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - target_os: ubuntu
+        target_os: [ubuntu]
     permissions:
       contents: read  # Explicit for default behavior
-      packages: write # Required for GHCR access
+      packages: read  # Explicit for GHCR access clarity
       actions: write  # Required for artifact upload
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-package.yml@v44
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-jit.yml@v51
     with:
       version: 7
       target_os: ${{ matrix.target_os }}
-      target_os_version: ${{ matrix.target_os_version }}
-      test_docker: ${{ matrix.target_os }}:${{ matrix.target_os_version || '22.04' }}
     secrets:
       ghcr_token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -170,3 +150,24 @@ jobs:
       ghcr_token: ${{ secrets.GITHUB_TOKEN }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+
+  # Rebuild prod-ready version without debug extensions and pack it to deb
+  package:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target_os: ubuntu
+    permissions:
+      contents: read  # Explicit for default behavior
+      packages: write # Required for GHCR access
+      actions: write  # Required for artifact upload
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-package.yml@v44
+    with:
+      version: 7
+      target_os: ${{ matrix.target_os }}
+      target_os_version: ${{ matrix.target_os_version }}
+      test_docker: ${{ matrix.target_os }}:${{ matrix.target_os_version || '22.04' }}
+    secrets:
+      ghcr_token: ${{ secrets.GITHUB_TOKEN }}
