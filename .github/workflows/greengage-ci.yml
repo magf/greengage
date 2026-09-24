@@ -44,7 +44,7 @@ jobs:
           - target_os: ubuntu
           - target_os: ubuntu
             target_os_version: "24.04"
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-pg_upgrade.yml@v56
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-pg_upgrade.yml@CI-6330
     with:
       target_os: ${{ matrix.target_os }}
       target_os_version: ${{ matrix.target_os_version }}
