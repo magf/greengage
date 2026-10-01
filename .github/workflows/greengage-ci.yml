@@ -71,7 +71,9 @@ jobs:
       target_os: ${{ matrix.target_os }}
       target_os_version: ${{ matrix.target_os_version }}
       logs: |
+        /data d log
         /data f *.log
+        /data f postgresql.conf
         gpAdminLogs d gpAdminLogs
         gpdb_src/src/test f *.diffs
         gpdb_src/src/test d results
