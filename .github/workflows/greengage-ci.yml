@@ -70,6 +70,13 @@ jobs:
       version: 7
       target_os: ${{ matrix.target_os }}
       target_os_version: ${{ matrix.target_os_version }}
+      logs: |
+        /data f *.log
+        gpAdminLogs d gpAdminLogs
+        gpdb_src/src/test f *.diffs
+        gpdb_src/src/test d results
+        gpdb_src/gpAux/gpdemo/datadirs d log
+        gpdb_src/gpAux/gpdemo/datadirs d pg_log
     secrets:
       ghcr_token: ${{ secrets.GITHUB_TOKEN }}
 
