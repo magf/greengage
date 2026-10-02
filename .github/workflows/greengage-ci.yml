@@ -180,10 +180,10 @@ jobs:
             test_install: true
           - target_os: rockylinux
             target_os_version: "8"
-            test_install: false
+            test_install: true
           - target_os: rockylinux
             target_os_version: "9"
-            test_install: false
+            test_install: true
     permissions:
       contents: read  # Explicit for default behavior
       packages: write # Required for GHCR access
