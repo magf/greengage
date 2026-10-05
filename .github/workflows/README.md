@@ -52,28 +52,30 @@ including re-publishing.
   race conditions.
 - **Multi-OS Matrix:** Builds and uploads packages for ubuntu 22.04 and
   ubuntu 24.04 in parallel.
-- **Cache-based Artifacts:** Restores built packages from cache using OS and
-  commit SHA as the key, rather than downloading artifacts from previous jobs.
+- **Artifact-based Packages:** Downloads built packages as an artifact of the
+  successful CI run for the tag (named
+  `{artifact_prefix}-{target_os}{target_os_version}`). If the artifact is not
+  found, falls back to restoring packages from cache.
 - **OS-specific Filenames:** Inserts `~{target_os}{target_os_version}` into
   each package filename before the architecture suffix prior to upload
   (e.g. `greengage6_6.30.1_amd64.deb` → `greengage6_6.30.1~ubuntu24.04_amd64.deb`).
-- **Manual Recovery:** If the cache is missing, the workflow checks the status
-  of the last build for the tag and provides clear instructions for manual
-  intervention. It does not automatically trigger builds to avoid infinite
-  loops.
+- **Manual Recovery:** If neither the artifact nor the cache is found, the
+  workflow reports an error with a link to the CI run and asks to re-run it.
+  It does not automatically trigger builds to avoid infinite loops.
 - **Safe Uploads:** Uploads packages with fixed naming patterns and optional
   overwrite (`clobber` flag).
 
 ### Behavior
 
-1. **Normal Flow (Cache Available):** Restores packages from cache, renames
-   them to the pattern `${PACKAGE_NAME}${VERSION}.${EXT}`, and uploads to the
-   release.
-2. **Cache Miss Scenarios:**
-   - **No previous build or previous build successful:** Provides instructions
-     to manually trigger the CI build, then restart the release workflow.
-   - **Previous build failed:** Reports the failure with a link to the failed
-     run and requires manual fixing before retrying.
+1. **Normal Flow (Artifact Available):** Waits for the CI run of the tag to
+   succeed, downloads the package artifact, inserts
+   `~{target_os}{target_os_version}` into each package filename before the
+   architecture suffix, and uploads the packages to the release.
+2. **Artifact Missing:** Tries to restore packages from cache. If the cache is
+   also missing, reports an error with a link to the CI run and requires
+   re-running it.
+3. **CI Run Failed:** Reports the failure with a link to the failed run and
+   requires manual fixing before retrying.
 
 The release workflow is designed to be robust and provide clear feedback when
 issues occur, ensuring that releases are always consistent and reliable.
@@ -138,7 +140,7 @@ To use this pipeline:
 >
 > **Note**: The release workflow (`greengage-release.yml`) is exempt from this
 > rule — it explicitly sets `target_os_version` for all matrix entries to
-> ensure unambiguous cache key matching with the build workflow.
+> ensure unambiguous artifact name matching with the build workflow.
 
 ## Additional Documentation
 
