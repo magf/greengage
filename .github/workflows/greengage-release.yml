@@ -10,15 +10,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-        - target_os: ubuntu
-          target_os_version: '22.04'
-          extensions: deb ddeb
-          artifact_prefix: deb-packages
-        - target_os: ubuntu
-          target_os_version: '24.04'
-          extensions: deb ddeb
-          artifact_prefix: deb-packages
+        target_os_version:
+        - '22.04'
+        - '24.04'
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -27,7 +21,7 @@ jobs:
       - name: Upload packages to release
         uses: greengagedb/greengage-ci/.github/actions/upload-pkgs-to-release@v45
         with:
-          target_os:         ${{ matrix.target_os }}
+          target_os:         ubuntu
+          extensions:        deb ddeb
+          artifact_prefix:   Package
           target_os_version: ${{ matrix.target_os_version }}
-          extensions:        ${{ matrix.extensions }}
-          artifact_prefix:   ${{ matrix.artifact_prefix }}
