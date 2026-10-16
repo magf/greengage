@@ -1362,6 +1362,14 @@ _copySplitUpdate(const SplitUpdate *from)
 	COPY_NODE_FIELD(insertColIdx);
 	COPY_NODE_FIELD(deleteColIdx);
 
+	COPY_SCALAR_FIELD(numHashSegments);
+	COPY_SCALAR_FIELD(numHashAttrs);
+	if (from->numHashAttrs > 0)
+	{
+		COPY_POINTER_FIELD(hashAttnos, from->numHashAttrs * sizeof(AttrNumber));
+		COPY_POINTER_FIELD(hashFuncs, from->numHashAttrs * sizeof(Oid));
+	}
+
 	return newnode;
 }
 
@@ -5020,8 +5028,10 @@ _copyCookedConstraint(const CookedConstraint *from)
 	COPY_STRING_FIELD(name);
 	COPY_SCALAR_FIELD(attnum);
 	COPY_NODE_FIELD(expr);
+	COPY_SCALAR_FIELD(skip_validation);
 	COPY_SCALAR_FIELD(is_local);
 	COPY_SCALAR_FIELD(inhcount);
+	COPY_SCALAR_FIELD(is_no_inherit);
 
 	return newnode;
 }

@@ -2260,6 +2260,11 @@ _readSplitUpdate(void)
 	READ_NODE_FIELD(insertColIdx);
 	READ_NODE_FIELD(deleteColIdx);
 
+	READ_INT_FIELD(numHashSegments);
+	READ_INT_FIELD(numHashAttrs);
+	READ_INT_ARRAY(hashAttnos, local_node->numHashAttrs, AttrNumber);
+	READ_OID_ARRAY(hashFuncs, local_node->numHashAttrs);
+
 	readPlanInfo((Plan *)local_node);
 
 	READ_DONE();
@@ -2711,8 +2716,10 @@ _readCookedConstraint(void)
 	READ_STRING_FIELD(name);
 	READ_INT_FIELD(attnum);
 	READ_NODE_FIELD(expr);
+	READ_BOOL_FIELD(skip_validation);
 	READ_BOOL_FIELD(is_local);
 	READ_INT_FIELD(inhcount);
+	READ_BOOL_FIELD(is_no_inherit);
 
 	READ_DONE();
 }
