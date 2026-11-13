@@ -52,7 +52,7 @@ jobs:
       contents: read  # Explicit for default behavior
       packages: read  # Explicit for GHCR access clarity
       actions: write  # Required for artifact upload
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-behave.yml@v51
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-behave.yml@CI-6569
     with:
       version: 6
       target_os: ${{ matrix.target_os }}
@@ -73,7 +73,7 @@ jobs:
       contents: read  # Explicit for default behavior
       packages: read  # Explicit for GHCR access clarity
       actions: write  # Required for artifact upload
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-regression.yml@v51
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-regression.yml@CI-6569
     with:
       version: 6
       target_os: ${{ matrix.target_os }}
@@ -94,7 +94,7 @@ jobs:
       contents: read
       packages: read
       actions: write
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-coverage.yml@v46
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-coverage.yml@CI-6569
     with:
       version: 6
       target_os: ${{ matrix.target_os }}
@@ -116,7 +116,7 @@ jobs:
       contents: read  # Explicit for default behavior
       packages: read  # Explicit for GHCR access clarity
       actions: write  # Required for artifact upload
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-orca.yml@v51
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-orca.yml@CI-6569
     with:
       version: 6
       target_os: ${{ matrix.target_os }}
@@ -136,7 +136,7 @@ jobs:
       contents: read  # Explicit for default behavior
       packages: read  # Explicit for GHCR access clarity
       actions: write  # Required for artifact upload
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-resgroup.yml@v31
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-resgroup.yml@CI-6569
     with:
       version: 6
       target_os: ${{ matrix.target_os }}
