@@ -1,0 +1,28 @@
+# ci/Dockerfile.base
+ARG TARGET_OS=ubuntu \
+    OS_VERSION=24.04
+FROM ${TARGET_OS}:${OS_VERSION} AS base
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+WORKDIR /home/gpadmin
+
+ARG TARGET_OS
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
+
+RUN --mount=type=bind,source=ci/scripts/setup_${TARGET_OS}.bash,target=SETUP.bash \
+    set -eux; \
+    IS_DOCKER_BUILD=true bash SETUP.bash; \
+# To run sshd directly, but not using `/etc/init.d/ssh start`
+    mkdir -p /run/sshd; \
+# Alter precedence in favor of IPv4 during resolving
+    echo 'precedence ::ffff:0:0/96  100' >> /etc/gai.conf
+
+RUN --mount=type=bind,source=ci/requirements.txt,target=requirements.txt \
+# Install the pinned pip first, without uninstalling the distro one
+    python3 -m pip install --no-cache-dir --ignore-installed pip==26.0.1  && \
+# Install Python packages
+    python3 -m pip install --no-cache-dir --ignore-installed --prefer-binary \
+        --requirement requirements.txt
+
+        ENV LANG=en_US.UTF-8 \
+    TARGET_OS=$TARGET_OS \
+    OUTPUT_ARTIFACT_DIR=bin_gpdb
