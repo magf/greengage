@@ -38,7 +38,7 @@ jobs:
   pg_upgrade-test:
     needs: build
     if: github.event_name == 'pull_request'  # Only for PR
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-pg_upgrade.yml@v63
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-pg_upgrade.yml@CI-6587
     with:
       target_os_version: "24.04"
     secrets:
@@ -51,7 +51,7 @@ jobs:
       contents: read  # Explicit for default behavior
       packages: read  # Explicit for GHCR access clarity
       actions: write  # Required for artifact upload
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-behave.yml@v61
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-behave.yml@CI-6587
     with:
       version: 7
       target_os: ubuntu
@@ -66,7 +66,7 @@ jobs:
       contents: read  # Explicit for default behavior
       packages: read  # Explicit for GHCR access clarity
       actions: write  # Required for artifact upload
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-regression.yml@v51
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-regression.yml@CI-6587
     with:
       version: 7
       target_os: ubuntu
@@ -81,7 +81,7 @@ jobs:
       contents: read  # Explicit for default behavior
       packages: read  # Explicit for GHCR access clarity
       actions: write  # Required for artifact upload
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-orca.yml@v51
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-orca.yml@CI-6587
     with:
       version: 7
       target_os: ubuntu
@@ -96,7 +96,7 @@ jobs:
       contents: read  # Explicit for default behavior
       packages: read  # Explicit for GHCR access clarity
       actions: write  # Required for artifact upload
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-resgroup.yml@v31
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-resgroup.yml@CI-6587
     with:
       version: 7
       target_os: ubuntu
@@ -111,7 +111,7 @@ jobs:
       contents: read  # Explicit for default behavior
       packages: read  # Explicit for GHCR access clarity
       actions: write  # Required for artifact upload
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-resgroup-v2.yml@v57
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-resgroup-v2.yml@CI-6587
     with:
       version: 7
       target_os: ubuntu
@@ -126,7 +126,7 @@ jobs:
       contents: read  # Explicit for default behavior
       packages: read  # Explicit for GHCR access clarity
       actions: write  # Required for artifact upload
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-jit.yml@v51
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-tests-jit.yml@CI-6587
     with:
       version: 7
       target_os: ubuntu
@@ -149,7 +149,7 @@ jobs:
       contents: read  # Explicit for default behavior
       packages: write # Required for GHCR access
       actions: write  # Required for artifact upload
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-upload.yml@v60
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-upload.yml@CI-6587
     with:
       version: 7
       target_os: ${{ matrix.target_os }}
@@ -176,7 +176,7 @@ jobs:
       contents: read  # Explicit for default behavior
       packages: write # Required for GHCR access
       actions: write  # Required for artifact upload
-    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-package.yml@v58
+    uses: greengagedb/greengage-ci/.github/workflows/greengage-reusable-package.yml@CI-6587
     with:
       version: 7
       target_os: ${{ matrix.target_os }}
