@@ -1,6 +1,6 @@
 # ci/Dockerfile.base
-ARG TARGET_OS \
-    OS_VERSION
+ARG TARGET_OS=ubuntu \
+    OS_VERSION=24.04
 FROM ${TARGET_OS}:${OS_VERSION} AS base
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
