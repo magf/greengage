@@ -1,12 +1,15 @@
 # ci/Dockerfile.developer
-ARG TARGET_OS=ubuntu \
-    OS_VERSION=24.04
+ARG TARGET_OS \
+    OS_VERSION
 ARG BASE_IMAGE=greengagedb/base_ggdb7_${TARGET_OS}${OS_VERSION}:latest
 
+# Parent of build, code and test: Greengage build parameters
 FROM ${BASE_IMAGE} AS base
+WORKDIR /home/gpadmin
 
 ARG CONFIGURE_FLAGS="--enable-debug-extensions --with-gssapi --enable-cassert --enable-debug --enable-depend"
-ENV CONFIGURE_FLAGS=$CONFIGURE_FLAGS
+ENV CONFIGURE_FLAGS=$CONFIGURE_FLAGS \
+    OUTPUT_ARTIFACT_DIR=bin_gpdb
 
 FROM base AS build
 ARG SKIP_UNITTESTS=

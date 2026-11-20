@@ -1,9 +1,8 @@
 # ci/Dockerfile.base
-ARG TARGET_OS=ubuntu \
-    OS_VERSION=24.04
+ARG TARGET_OS \
+    OS_VERSION
 FROM ${TARGET_OS}:${OS_VERSION} AS base
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-WORKDIR /home/gpadmin
 
 ARG TARGET_OS
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
@@ -23,6 +22,5 @@ RUN --mount=type=bind,source=ci/requirements.txt,target=requirements.txt \
     python3 -m pip install --no-cache-dir --ignore-installed --prefer-binary \
         --requirement requirements.txt
 
-        ENV LANG=en_US.UTF-8 \
-    TARGET_OS=$TARGET_OS \
-    OUTPUT_ARTIFACT_DIR=bin_gpdb
+ENV LANG=en_US.UTF-8 \
+    TARGET_OS=$TARGET_OS
