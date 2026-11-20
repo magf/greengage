@@ -177,5 +177,6 @@ EOF
 * hard nproc 131072
 * soft core unlimited
 EOF
-
+else
+   dnf clean all
 fi
