@@ -67,9 +67,11 @@ echo "deb [signed-by=/etc/apt/keyrings/greengagedb.gpg] \
 	greengagedb main" \
 	| tee /etc/apt/sources.list.d/greengagedb.list
 
-set +e
-
-tee -a /etc/sysctl.conf << EOF
+#---------------------------------------------------------------------
+# Bare-metal only configuration
+#---------------------------------------------------------------------
+if [[ ! -f /.dockerenv && -z "${IS_DOCKER_BUILD:-}" ]]; then
+	tee -a /etc/sysctl.conf << EOF
 kernel.shmmax = 5000000000000
 kernel.shmmni = 32768
 kernel.shmall = 40000000000
@@ -87,14 +89,19 @@ vm.overcommit_memory = 2
 vm.overcommit_ratio = 95
 EOF
 
-sysctl -p
+	sysctl -p
 
-mkdir -p /etc/security/limits.d
-tee -a /etc/security/limits.d/90-greengage.conf << EOF
+	mkdir -p /etc/security/limits.d
+	tee -a /etc/security/limits.d/90-greengage.conf << EOF
 * soft nofile 1048576
 * hard nofile 1048576
 * soft nproc 1048576
 * hard nproc 1048576
 EOF
 
-ulimit -n 65536 65536
+	ulimit -n 65536 65536
+else
+	rm -rf /var/lib/apt/lists/*
+	rm -rf /var/cache/debconf/*-old
+	locale-gen en_US.UTF-8
+fi
